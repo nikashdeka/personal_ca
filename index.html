@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Chosen Palette: Calm Harmony (Warm Neutrals with Blue/Green Accent) -->
+    <!-- Application Structure Plan: A dashboard-style SPA with side navigation to thematic sections (Dashboard, Tax Centre, Financial Fortress, Wealth Engine, Action Plan). This non-linear structure empowers the user to explore topics based on their immediate needs, while interactive calculators and charts make complex financial concepts tangible and personalized. This is superior to a static report for engagement and understanding. -->
+    <!-- Visualization & Content Choices: [Tax Comparison -> Bar Chart (Chart.js) -> Interactive sliders -> Clearly visualizes savings], [Asset Allocation -> Donut Chart (Chart.js) -> Hover reveals details -> Quick visual understanding of portfolio mix], [Deductions -> Interactive HTML Cards -> Click to expand -> Breaks down complex info into digestible parts], [Calculators -> HTML Forms + JS -> User inputs data -> Provides personalized, actionable numbers]. This approach uses the best tool for each piece of information to maximize clarity and interaction. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+        .nav-item.active {
+            background-color: #e0f2fe; /* light-sky-100 */
+            color: #0284c7; /* sky-600 */
+            font-weight: 600;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .kpi-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.2s;
+        }
+        .kpi-card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="flex min-h-screen">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="bg-white w-64 p-4 shadow-lg fixed lg:relative -translate-x-full lg:translate-x-0 transition-transform duration-300 z-20">
+            <div class="flex items-center mb-8">
+                <div class="bg-sky-500 text-white p-3 rounded-full mr-3">
+                    <i class="fas fa-landmark"></i>
+                </div>
+                <h1 class="text-xl font-bold text-slate-700">Financial Advisor</h1>
+            </div>
+            <nav id="main-nav">
+                <a href="#dashboard" class="nav-item flex items-center p-3 my-1 rounded-lg hover:bg-slate-100 transition-colors duration-200 active">
+                    <i class="fas fa-tachometer-alt w-6 text-center mr-3"></i> Dashboard
+                </a>
+                <a href="#tax-centre" class="nav-item flex items-center p-3 my-1 rounded-lg hover:bg-slate-100 transition-colors duration-200">
+                    <i class="fas fa-calculator w-6 text-center mr-3"></i> Tax Centre
+                </a>
+                <a href="#fortress" class="nav-item flex items-center p-3 my-1 rounded-lg hover:bg-slate-100 transition-colors duration-200">
+                    <i class="fas fa-shield-halved w-6 text-center mr-3"></i> Financial Fortress
+                </a>
+                <a href="#wealth-engine" class="nav-item flex items-center p-3 my-1 rounded-lg hover:bg-slate-100 transition-colors duration-200">
+                    <i class="fas fa-chart-line w-6 text-center mr-3"></i> Wealth Engine
+                </a>
+                <a href="#action-plan" class="nav-item flex items-center p-3 my-1 rounded-lg hover:bg-slate-100 transition-colors duration-200">
+                    <i class="fas fa-tasks w-6 text-center mr-3"></i> Action Plan
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-4 md:p-8 lg:p-10 bg-slate-50">
+            <button id="menu-toggle" class="lg:hidden fixed top-4 left-4 z-30 bg-white p-2 rounded-md shadow-md">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="tab-content active">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Your Financial Dashboard</h2>
+                <p class="text-slate-500 mb-8">A summary of your key financial metrics and recommendations for FY 2024-25.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <!-- Key Recommendation Card -->
+                    <div class="kpi-card xl:col-span-2">
+                        <div class="flex items-center text-amber-500 mb-3">
+                            <i class="fas fa-star text-2xl mr-3"></i>
+                            <h3 class="text-xl font-semibold text-slate-700">Primary Recommendation: Adopt Old Tax Regime</h3>
+                        </div>
+                        <p class="text-slate-600 mb-4">Based on your high rental expenses and eligibility for key deductions, the Old Tax Regime is significantly more beneficial. This choice is the cornerstone of your tax-saving strategy for this year.</p>
+                        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-r-lg">
+                            <p class="font-bold">Estimated Annual Tax Savings:</p>
+                            <p class="text-3xl font-bold">₹ 78,000</p>
+                            <p class="text-sm">Compared to the New Tax Regime. Explore the Tax Centre for a detailed breakdown.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Life Insurance Card -->
+                    <div class="kpi-card">
+                        <div class="flex items-center text-sky-500 mb-3">
+                            <i class="fas fa-heart-pulse text-2xl mr-3"></i>
+                            <h3 class="text-xl font-semibold text-slate-700">Life Insurance Goal</h3>
+                        </div>
+                        <p class="text-slate-600 mb-4">To fully protect your family's future, a substantial life cover is essential.</p>
+                        <div class="text-center">
+                            <p class="text-slate-500">Recommended Term Cover</p>
+                            <p class="text-4xl font-bold text-sky-600">₹ 2.5 Cr</p>
+                        </div>
+                    </div>
+
+                    <!-- Asset Allocation Card -->
+                    <div class="kpi-card">
+                        <div class="flex items-center text-indigo-500 mb-3">
+                           <i class="fas fa-chart-pie text-2xl mr-3"></i>
+                           <h3 class="text-xl font-semibold text-slate-700">Investment Strategy</h3>
+                        </div>
+                         <p class="text-slate-600">A growth-oriented portfolio to build wealth over the long term.</p>
+                        <div class="chart-container h-64 max-h-64">
+                            <canvas id="assetAllocationChart"></canvas>
+                        </div>
+                    </div>
+
+                     <!-- Emergency Fund Card -->
+                    <div class="kpi-card">
+                        <div class="flex items-center text-emerald-500 mb-3">
+                            <i class="fas fa-suitcase-medical text-2xl mr-3"></i>
+                            <h3 class="text-xl font-semibold text-slate-700">Emergency Fund</h3>
+                        </div>
+                        <p class="text-slate-600 mb-4">Your financial safety net. Aim for 6 months of essential expenses.</p>
+                        <div class="text-center">
+                            <p class="text-slate-500">Target Corpus</p>
+                            <p class="text-4xl font-bold text-emerald-600">₹ 8 Lakhs+</p>
+                            <p class="text-sm">(based on illustrative expenses)</p>
+                        </div>
+                    </div>
+
+                    <!-- Next Step Card -->
+                    <div class="kpi-card bg-sky-500 text-white">
+                        <div class="flex items-center mb-3">
+                            <i class="fas fa-arrow-right text-2xl mr-3"></i>
+                            <h3 class="text-xl font-semibold">Your Next Step</h3>
+                        </div>
+                        <p class="mb-4">Begin your journey to financial wellness by exploring the detailed sections.</p>
+                        <button onclick="document.querySelector('a[href=\'#action-plan\']').click()" class="bg-white text-sky-600 font-bold py-2 px-4 rounded-lg w-full hover:bg-sky-100 transition-colors">
+                            View Your Action Plan
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tax Centre Section -->
+            <section id="tax-centre" class="tab-content">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Tax Centre</h2>
+                <p class="text-slate-500 mb-8">Interactively compare tax regimes and understand how to maximize your deductions.</p>
+                
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-slate-700 mb-4">Interactive Tax Regime Comparator</h3>
+                    <p class="text-slate-600 mb-6">Adjust the sliders to see how your tax liability changes under each regime. This tool will help you confirm that the Old Regime is the best choice for you.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <div class="mb-4">
+                                <label for="grossSalary" class="block text-sm font-medium text-slate-600">Gross Salary (Pre-Lease)</label>
+                                <input type="range" id="grossSalary" min="1000000" max="5000000" step="100000" value="3500000" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                                <div class="text-right font-semibold text-sky-600 mt-1">₹ <span id="grossSalaryValue">35,00,000</span></div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="hraExemption" class="block text-sm font-medium text-slate-600">HRA Exemption</label>
+                                <input type="range" id="hraExemption" min="0" max="500000" step="10000" value="300000" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                                <div class="text-right font-semibold text-sky-600 mt-1">₹ <span id="hraExemptionValue">3,00,000</span></div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="chapterVIDeductions" class="block text-sm font-medium text-slate-600">80C + 80D Deductions</label>
+                                <input type="range" id="chapterVIDeductions" min="0" max="225000" step="5000" value="225000" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                                <div class="text-right font-semibold text-sky-600 mt-1">₹ <span id="chapterVIDeductionsValue">2,25,000</span></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="chart-container">
+                                <canvas id="taxComparisonChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-8 p-4 bg-amber-100 border-l-4 border-amber-400 rounded-r-lg">
+                        <p class="text-amber-800"><i class="fas fa-car mr-2"></i>The car lease benefit (net reduction of ~₹4.27 Lakhs in taxable income) and standard deduction of ₹50,000 are applied under both regimes in this calculation.</p>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Financial Fortress Section -->
+            <section id="fortress" class="tab-content">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Financial Fortress</h2>
+                <p class="text-slate-500 mb-8">Build your financial bedrock with adequate insurance and a robust emergency fund.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Insurance Hub -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold text-slate-700 mb-4">Insurance Hub</h3>
+                        <p class="text-slate-600 mb-6">Protect against life's biggest risks. A layered approach provides the best, most cost-effective coverage.</p>
+                        
+                        <div class="space-y-4">
+                            <div class="p-4 border rounded-lg">
+                                <p class="font-bold text-sky-600">Life Insurance (Term Plan)</p>
+                                <p>Recommended Cover: <span class="font-bold text-xl">₹2.5 - 3 Crore</span></p>
+                                <p class="text-sm text-slate-500">To replace your income and secure your family's goals.</p>
+                            </div>
+                            <div class="p-4 border rounded-lg">
+                                <p class="font-bold text-sky-600">Health Insurance (Your Family)</p>
+                                <p>Base Cover: <span class="font-bold text-xl">₹20 - 30 Lakhs</span></p>
+                                <p class="text-sm text-slate-500">A family floater for you, your spouse, and child.</p>
+                            </div>
+                            <div class="p-4 border rounded-lg">
+                                <p class="font-bold text-sky-600">Health Insurance (Parents)</p>
+                                <p>Base Cover: <span class="font-bold text-xl">₹15 - 20 Lakhs</span></p>
+                                <p class="text-sm text-slate-500">A separate senior citizen policy for comprehensive care.</p>
+                            </div>
+                             <div class="p-4 border border-dashed rounded-lg bg-slate-50">
+                                <p class="font-bold text-green-600">Super Top-Up Plan</p>
+                                <p>Suggested Cover: <span class="font-bold text-xl">₹1 Crore</span></p>
+                                <p class="text-sm text-slate-500">A cost-effective way to get high coverage for catastrophic events, with a deductible matching your base policy.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Emergency Fund Planner -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold text-slate-700 mb-4">Emergency Fund Planner</h3>
+                        <p class="text-slate-600 mb-6">Calculate the ideal size of your contingency fund. This money should be kept in liquid, easily accessible instruments.</p>
+
+                        <div>
+                            <label for="monthlyExpenses" class="block text-sm font-medium text-slate-600">Your Essential Monthly Expenses (₹)</label>
+                            <input type="number" id="monthlyExpenses" value="120000" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
+                            <p class="text-xs text-slate-500 mt-1">Include rent, essential bills, EMIs, groceries, etc.</p>
+                        </div>
+                        <div class="mt-6 text-center bg-emerald-50 p-6 rounded-lg">
+                            <p class="text-lg font-medium text-emerald-800">Your Target 6-Month Emergency Fund:</p>
+                            <p id="emergencyFundTarget" class="text-4xl font-extrabold text-emerald-600 mt-2">₹ 7,20,000</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Wealth Engine Section -->
+            <section id="wealth-engine" class="tab-content">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Wealth Engine</h2>
+                <p class="text-slate-500 mb-8">Strategies for long-term wealth creation and goal-based investing.</p>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                    <div class="lg:col-span-3 bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold text-slate-700 mb-4">Goal-Based Investment Plan</h3>
+                        <p class="text-slate-600 mb-6">A structured approach to investing ensures you meet your life's most important financial milestones. Here are the recommended strategies for each goal.</p>
+                        <div class="space-y-4">
+                            <!-- Retirement -->
+                            <details class="group bg-slate-50 p-4 rounded-lg cursor-pointer">
+                                <summary class="font-semibold text-lg text-slate-800 flex justify-between items-center">
+                                    Retirement Planning
+                                    <i class="fas fa-chevron-down group-open:rotate-180 transition-transform"></i>
+                                </summary>
+                                <div class="mt-4 text-slate-600 border-t pt-4">
+                                    <p class="font-bold">Instruments:</p>
+                                    <ul class="list-disc list-inside mt-2 space-y-1">
+                                        <li><strong class="text-indigo-600">NPS:</strong> Maximize for tax benefits (including ₹50k extra) and low-cost growth.</li>
+                                        <li><strong class="text-indigo-600">EPF:</strong> Forms the stable debt anchor of your portfolio.</li>
+                                        <li><strong class="text-indigo-600">Equity Mutual Fund SIPs:</strong> Dedicated long-term SIPs to build an inflation-beating corpus.</li>
+                                    </ul>
+                                </div>
+                            </details>
+                            <!-- Child's Future -->
+                            <details class="group bg-slate-50 p-4 rounded-lg cursor-pointer">
+                                <summary class="font-semibold text-lg text-slate-800 flex justify-between items-center">
+                                    Child's Future
+                                    <i class="fas fa-chevron-down group-open:rotate-180 transition-transform"></i>
+                                </summary>
+                                <div class="mt-4 text-slate-600 border-t pt-4">
+                                    <p class="font-bold">Strategy: Unbundle Insurance & Investment</p>
+                                    <p class="mt-2">Avoid costly, inefficient child plans. Use your term plan for risk cover and invest directly for returns.</p>
+                                    <ul class="list-disc list-inside mt-2 space-y-1">
+                                        <li><strong class="text-indigo-600">Investment:</strong> Start a dedicated long-term SIP in diversified equity mutual funds.</li>
+                                        <li><strong class="text-indigo-600">Goal:</strong> Earmark this portfolio to build a substantial corpus for higher education.</li>
+                                    </ul>
+                                </div>
+                            </details>
+                            <!-- Parents' Care -->
+                            <details class="group bg-slate-50 p-4 rounded-lg cursor-pointer">
+                                <summary class="font-semibold text-lg text-slate-800 flex justify-between items-center">
+                                    Parents' Financial Care
+                                    <i class="fas fa-chevron-down group-open:rotate-180 transition-transform"></i>
+                                </summary>
+                                <div class="mt-4 text-slate-600 border-t pt-4">
+                                    <p class="font-bold">Strategy: Capital Preservation & Regular Income</p>
+                                    <p class="mt-2">Focus on safe, government-backed schemes to supplement their pension.</p>
+                                     <ul class="list-disc list-inside mt-2 space-y-1">
+                                        <li><strong class="text-indigo-600">Senior Citizen Savings Scheme (SCSS):</strong> Top priority for high, guaranteed returns.</li>
+                                        <li><strong class="text-indigo-600">Post Office MIS (POMIS):</strong> To generate fixed monthly income.</li>
+                                    </ul>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                     <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold text-slate-700 mb-4">Core & Satellite Equity Strategy</h3>
+                        <p class="text-slate-600 mb-6">For your interest in direct stocks, adopt a disciplined approach to balance stable growth with focused bets.</p>
+                         <div class="relative pt-4">
+                            <div class="flex mb-2 items-center justify-between">
+                                <div>
+                                    <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-sky-600 bg-sky-200">
+                                        Core: 80-90%
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="overflow-hidden h-4 mb-4 text-xs flex rounded bg-sky-100">
+                                <div style="width: 85%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-sky-500"></div>
+                            </div>
+                             <p class="text-sm text-slate-500 -mt-2">Invested in diversified mutual funds for stable, long-term growth.</p>
+                        </div>
+                         <div class="relative pt-4">
+                            <div class="flex mb-2 items-center justify-between">
+                                <div>
+                                    <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-amber-600 bg-amber-200">
+                                        Satellite: 10-20%
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="overflow-hidden h-4 mb-4 text-xs flex rounded bg-amber-100">
+                                <div style="width: 15%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-amber-500"></div>
+                            </div>
+                             <p class="text-sm text-slate-500 -mt-2">Allocated to direct stocks based on fundamental research, not speculation.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Action Plan Section -->
+            <section id="action-plan" class="tab-content">
+                 <h2 class="text-3xl font-bold text-slate-800 mb-2">Your Action Plan</h2>
+                <p class="text-slate-500 mb-8">A prioritized checklist to guide your next steps. Focus on one section at a time to build momentum.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Immediate Actions -->
+                    <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-red-500">
+                        <h3 class="text-xl font-semibold text-slate-700 mb-4">Immediate Actions (Next 30 Days)</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start"><input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-sky-600 focus:ring-sky-500 mt-1 mr-3"><span class="text-slate-700">File ITR-2 for AY 2025-26, explicitly opting for the Old Regime.</span></li>
+                            <li class="flex items-start"><input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-sky-600 focus:ring-sky-500 mt-1 mr-3"><span class="text-slate-700">Review and upgrade health insurance to the recommended structure.</span></li>
+                            <li class="flex items-start"><input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-sky-600 focus:ring-sky-500 mt-1 mr-3"><span class="text-slate-700">Consult a lawyer to draft a legally valid Will.</span></li>
+                            <li class="flex items-start"><input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-sky-600 focus:ring-sky-500 mt-1 mr-3"><span class="text-slate-700">Gather all tax documents (Form 16, rent receipts, investment proofs).</span></li>
+                        </ul>
+                    </div>
+
+                    <!-- Short-term Actions -->
+                    <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-amber-500">
+                        <h3 class="text-xl font-semibold text-slate-700 mb-4">Short-Term Actions (1-6 Months)</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start"><input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-sky-600 focus:ring-sky-500 mt-1 mr-3"><span class="text-slate-700">Calculate and start building your Emergency Fund via automated transfers.</span></li>
+                            <li class="flex items-start"><input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-sky-600 focus:ring-sky-500 mt-1 mr-3"><span class="text-slate-700">Begin SIPs in recommended mutual funds for retirement & child's future.</span></li>
+                            <li class="flex items-start"><input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-sky-600 focus:ring-sky-500 mt-1 mr-3"><span class="text-slate-700">Realign parents' investments into SCSS and POMIS.</span></li>
+                            <li class="flex items-start"><input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-sky-600 focus:ring-sky-500 mt-1 mr-3"><span class="text-slate-700">Review and update nominations on all financial accounts.</span></li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Long-term Actions -->
+                    <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-green-500">
+                        <h3 class="text-xl font-semibold text-slate-700 mb-4">Ongoing & Annual Reviews</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start"><input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-sky-600 focus:ring-sky-500 mt-1 mr-3"><span class="text-slate-700">Schedule an annual financial health check-up to review this plan.</span></li>
+                            <li class="flex items-start"><input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-sky-600 focus:ring-sky-500 mt-1 mr-3"><span class="text-slate-700">Rebalance investment portfolio annually to maintain asset allocation.</span></li>
+                            <li class="flex items-start"><input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-sky-600 focus:ring-sky-500 mt-1 mr-3"><span class="text-slate-700">Review insurance cover every 2-3 years or after a major life event.</span></li>
+                             <li class="flex items-start"><input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-sky-600 focus:ring-sky-500 mt-1 mr-3"><span class="text-slate-700">Annually review rental agreements and market rates for your properties.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const navLinks = document.querySelectorAll('#main-nav a');
+    const sections = document.querySelectorAll('.tab-content');
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+
+    const formatCurrency = (value) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value).replace('₹', '');
+
+    // Navigation
+    function navigateTo(hash) {
+        navLinks.forEach(link => {
+            link.classList.toggle('active', link.hash === hash);
+        });
+        sections.forEach(section => {
+            section.classList.toggle('active', section.id === hash.substring(1));
+        });
+        window.scrollTo(0, 0);
+        if (window.innerWidth < 1024) {
+            sidebar.classList.add('-translate-x-full');
+        }
+    }
+    
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const hash = e.currentTarget.hash;
+            window.location.hash = hash;
+            navigateTo(hash);
+        });
+    });
+
+    const initialHash = window.location.hash || '#dashboard';
+    navigateTo(initialHash);
+    
+    menuToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('-translate-x-full');
+    });
+
+    // Dashboard Charts
+    const assetAllocationCtx = document.getElementById('assetAllocationChart').getContext('2d');
+    new Chart(assetAllocationCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Equity', 'Debt', 'Gold'],
+            datasets: [{
+                data: [65, 25, 10],
+                backgroundColor: ['#4f46e5', '#16a34a', '#f59e0b'],
+                borderColor: '#f8fafc',
+                borderWidth: 4,
+                hoverOffset: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        font: { size: 14 }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.label}: ${context.raw}%`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Tax Comparator
+    const grossSalarySlider = document.getElementById('grossSalary');
+    const hraExemptionSlider = document.getElementById('hraExemption');
+    const chapterVIDeductionsSlider = document.getElementById('chapterVIDeductions');
+
+    const grossSalaryValue = document.getElementById('grossSalaryValue');
+    const hraExemptionValue = document.getElementById('hraExemptionValue');
+    const chapterVIDeductionsValue = document.getElementById('chapterVIDeductionsValue');
+
+    let taxChart;
+
+    function calculateTax(taxableIncome, regime) {
+        let tax = 0;
+        const slabs = regime === 'old' 
+            ? [
+                { limit: 250000, rate: 0 },
+                { limit: 500000, rate: 0.05 },
+                { limit: 1000000, rate: 0.20 },
+                { limit: Infinity, rate: 0.30 }
+              ]
+            : [
+                { limit: 300000, rate: 0 },
+                { limit: 600000, rate: 0.05 },
+                { limit: 900000, rate: 0.10 },
+                { limit: 1200000, rate: 0.15 },
+                { limit: 1500000, rate: 0.20 },
+                { limit: Infinity, rate: 0.30 }
+              ];
+        
+        let remainingIncome = taxableIncome;
+        let lastLimit = 0;
+        
+        for (const slab of slabs) {
+            if (remainingIncome <= 0) break;
+            const taxableInSlab = Math.min(remainingIncome, slab.limit - lastLimit);
+            tax += taxableInSlab * slab.rate;
+            remainingIncome -= taxableInSlab;
+            lastLimit = slab.limit;
+        }
+
+        const cess = tax * 0.04;
+        return tax + cess;
+    }
+
+    function updateTaxComparison() {
+        const salary = parseFloat(grossSalarySlider.value);
+        const hra = parseFloat(hraExemptionSlider.value);
+        const chapterVI = parseFloat(chapterVIDeductionsSlider.value);
+        
+        grossSalaryValue.textContent = formatCurrency(salary);
+        hraExemptionValue.textContent = formatCurrency(hra);
+        chapterVIDeductionsValue.textContent = formatCurrency(chapterVI);
+
+        const carLeaseBenefit = 427200;
+        const standardDeduction = 50000;
+        // Assuming ₹4L house property income
+        const housePropertyIncome = 400000;
+        
+        const adjustedSalary = salary - carLeaseBenefit;
+        const gti = adjustedSalary + housePropertyIncome;
+
+        const taxableIncomeOld = gti - standardDeduction - hra - chapterVI;
+        const taxableIncomeNew = gti - standardDeduction;
+
+        const taxOld = calculateTax(taxableIncomeOld, 'old');
+        const taxNew = calculateTax(taxableIncomeNew, 'new');
+
+        if (taxChart) {
+            taxChart.data.datasets[0].data = [taxOld, taxNew];
+            taxChart.update();
+        }
+    }
+
+    function createTaxChart() {
+        const taxComparisonCtx = document.getElementById('taxComparisonChart').getContext('2d');
+        taxChart = new Chart(taxComparisonCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Old Regime', 'New Regime'],
+                datasets: [{
+                    label: 'Total Tax Liability',
+                    data: [0, 0],
+                    backgroundColor: ['#38bdf8', '#fb923c'],
+                    borderColor: ['#0284c7', '#ea580c'],
+                    borderWidth: 1,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => `₹ ${formatCurrency(context.raw)}`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: (value) => `₹ ${formatCurrency(value/100000)}L`
+                        }
+                    }
+                }
+            }
+        });
+        updateTaxComparison();
+    }
+
+    grossSalarySlider.addEventListener('input', updateTaxComparison);
+    hraExemptionSlider.addEventListener('input', updateTaxComparison);
+    chapterVIDeductionsSlider.addEventListener('input', updateTaxComparison);
+
+    // Emergency Fund Planner
+    const monthlyExpensesInput = document.getElementById('monthlyExpenses');
+    const emergencyFundTarget = document.getElementById('emergencyFundTarget');
+
+    function updateEmergencyFund() {
+        const expenses = parseFloat(monthlyExpensesInput.value) || 0;
+        const target = expenses * 6;
+        emergencyFundTarget.textContent = '₹ ' + formatCurrency(target);
+    }
+
+    monthlyExpensesInput.addEventListener('input', updateEmergencyFund);
+    
+    // Initial calls
+    createTaxChart();
+    updateEmergencyFund();
+});
+</script>
+
+</body>
+</html>
