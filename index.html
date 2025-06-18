@@ -46,6 +46,35 @@
         .kpi-card:hover {
             transform: translateY(-5px);
         }
+        .tax-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+        .tax-tab {
+             display: none;
+        }
+        .tax-tab.active {
+            display: block;
+        }
+        .tax-tab-button {
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        .tax-tab-button.active {
+            background-color: #e0f2fe;
+            color: #0284c7;
+            border-color: #7dd3fc;
+        }
+        .tax-tab-button:not(.active):hover {
+            background-color: #f1f5f9;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
@@ -99,7 +128,7 @@
                         <p class="text-slate-600 mb-4">Based on your high rental expenses and eligibility for key deductions, the Old Tax Regime is significantly more beneficial. This choice is the cornerstone of your tax-saving strategy for this year.</p>
                         <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-r-lg">
                             <p class="font-bold">Estimated Annual Tax Savings:</p>
-                            <p class="text-3xl font-bold">₹ 78,000</p>
+                            <p id="estimatedSavings" class="text-3xl font-bold">₹ 78,000</p>
                             <p class="text-sm">Compared to the New Tax Regime. Explore the Tax Centre for a detailed breakdown.</p>
                         </div>
                     </div>
@@ -160,38 +189,104 @@
             <!-- Tax Centre Section -->
             <section id="tax-centre" class="tab-content">
                 <h2 class="text-3xl font-bold text-slate-800 mb-2">Tax Centre</h2>
-                <p class="text-slate-500 mb-8">Interactively compare tax regimes and understand how to maximize your deductions.</p>
+                <p class="text-slate-500 mb-8">Enter your detailed financial data to get a precise tax comparison and maximize your savings.</p>
                 
                 <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-slate-700 mb-4">Interactive Tax Regime Comparator</h3>
-                    <p class="text-slate-600 mb-6">Adjust the sliders to see how your tax liability changes under each regime. This tool will help you confirm that the Old Regime is the best choice for you.</p>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div>
-                            <div class="mb-4">
-                                <label for="grossSalary" class="block text-sm font-medium text-slate-600">Gross Salary (Pre-Lease)</label>
-                                <input type="range" id="grossSalary" min="1000000" max="5000000" step="100000" value="3500000" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                                <div class="text-right font-semibold text-sky-600 mt-1">₹ <span id="grossSalaryValue">35,00,000</span></div>
-                            </div>
-                            <div class="mb-4">
-                                <label for="hraExemption" class="block text-sm font-medium text-slate-600">HRA Exemption</label>
-                                <input type="range" id="hraExemption" min="0" max="500000" step="10000" value="300000" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                                <div class="text-right font-semibold text-sky-600 mt-1">₹ <span id="hraExemptionValue">3,00,000</span></div>
-                            </div>
-                            <div class="mb-4">
-                                <label for="chapterVIDeductions" class="block text-sm font-medium text-slate-600">80C + 80D Deductions</label>
-                                <input type="range" id="chapterVIDeductions" min="0" max="225000" step="5000" value="225000" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                                <div class="text-right font-semibold text-sky-600 mt-1">₹ <span id="chapterVIDeductionsValue">2,25,000</span></div>
+                    <div class="flex space-x-2 border-b mb-6">
+                        <button class="tax-tab-button active" data-tab="income">1. Income Details</button>
+                        <button class="tax-tab-button" data-tab="property">2. House Property</button>
+                        <button class="tax-tab-button" data-tab="deductions">3. Deductions</button>
+                    </div>
+                    
+                    <div id="tax-calculator-form">
+                        <!-- Income Tab -->
+                        <div id="tab-income" class="tax-tab active">
+                            <h3 class="font-semibold text-lg mb-4 text-slate-700">Salary & Other Income</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <!-- Salary Components -->
+                                <div><label class="text-sm">Basic Salary</label><input type="number" id="basic_salary" class="tax-input" value="1800000"></div>
+                                <div><label class="text-sm">Basic Arrear</label><input type="number" id="basic_arrear" class="tax-input" value="0"></div>
+                                <div><label class="text-sm">HRA Received</label><input type="number" id="hra_received" class="tax-input" value="700000"></div>
+                                <div><label class="text-sm">HRA Arrear</label><input type="number" id="hra_arrear" class="tax-input" value="0"></div>
+                                <div><label class="text-sm">LTA</label><input type="number" id="lta" class="tax-input" value="50000"></div>
+                                <div><label class="text-sm">Performance Bonus</label><input type="number" id="performance_bonus" class="tax-input" value="200000"></div>
+                                <div><label class="text-sm">Other Taxable Allowances</label><input type="number" id="other_allowance" class="tax-input" value="100000"></div>
+                                <!-- Perquisites -->
+                                <div><label class="text-sm">Motor Car Perquisite Value</label><input type="number" id="car_perq" class="tax-input" value="28800"></div>
+                                <!-- Other Income -->
+                                <div><label class="text-sm">Interest Income (Savings, FD)</label><input type="number" id="interest_income" class="tax-input" value="25000"></div>
+                                <div><label class="text-sm">Any Other Income</label><input type="number" id="any_other_income" class="tax-input" value="0"></div>
                             </div>
                         </div>
-                        <div>
-                            <div class="chart-container">
-                                <canvas id="taxComparisonChart"></canvas>
+
+                        <!-- House Property Tab -->
+                        <div id="tab-property" class="tax-tab">
+                             <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-semibold text-lg text-slate-700">Income from House Property</h3>
+                                <button id="add-property-btn" class="bg-sky-500 text-white text-sm font-bold py-2 px-3 rounded-lg hover:bg-sky-600 transition-colors"><i class="fas fa-plus mr-2"></i>Add Property</button>
+                             </div>
+                             <div id="property-list" class="space-y-4">
+                                <!-- Property Cards will be injected here -->
+                             </div>
+                        </div>
+
+                        <!-- Deductions Tab -->
+                        <div id="tab-deductions" class="tax-tab">
+                             <h3 class="font-semibold text-lg mb-4 text-slate-700">Tax Saving Deductions (for Old Regime)</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <!-- 80C -->
+                                <div class="space-y-4 p-4 bg-slate-50 rounded-lg">
+                                    <h4 class="font-semibold text-slate-600 border-b pb-2">Chapter VI-A (Sec 80C, etc)</h4>
+                                    <div><label class="text-sm">Life Insurance Premium</label><input type="number" id="lic" class="tax-input" value="25000"></div>
+                                    <div><label class="text-sm">EPF Contribution</label><input type="number" id="epf" class="tax-input" value="75000"></div>
+                                    <div><label class="text-sm">Tuition Fees</label><input type="number" id="tuition_fees" class="tax-input" value="80000"></div>
+                                    <div><label class="text-sm">Other 80C (PPF, ELSS, etc)</label><input type="number" id="other_80c" class="tax-input" value="0"></div>
+                                </div>
+                                <!-- 80D -->
+                                <div class="space-y-4 p-4 bg-slate-50 rounded-lg">
+                                    <h4 class="font-semibold text-slate-600 border-b pb-2">Health (Sec 80D)</h4>
+                                    <div><label class="text-sm">Health Insurance (Self/Family)</label><input type="number" id="health_insurance_self" class="tax-input" value="25000"></div>
+                                    <div><label class="text-sm">Health Insurance (Parents < 60)</label><input type="number" id="health_insurance_parents" class="tax-input" value="0"></div>
+                                    <div><label class="text-sm">Health Insurance (Parents >= 60)</label><input type="number" id="health_insurance_parents_sr" class="tax-input" value="50000"></div>
+                                </div>
+                                <!-- Other Deductions -->
+                                <div class="space-y-4 p-4 bg-slate-50 rounded-lg">
+                                    <h4 class="font-semibold text-slate-600 border-b pb-2">Other Deductions & Exemptions</h4>
+                                    <div><label class="text-sm">Rent Paid Annually (for HRA)</label><input type="number" id="rent_paid" class="tax-input" value="840000"></div>
+                                    <div><label class="text-sm">Metro City? (for HRA)</label><input type="checkbox" id="is_metro" class="h-5 w-5 rounded border-gray-300 text-sky-600 focus:ring-sky-500" checked></div>
+                                    <div><label class="text-sm">Professional Tax</label><input type="number" id="prof_tax" class="tax-input" value="2400"></div>
+                                    <div><label class="text-sm">Interest on Savings A/C (80TTA)</label><input type="number" id="interest_80tta" class="tax-input" value="10000"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="mt-8 p-4 bg-amber-100 border-l-4 border-amber-400 rounded-r-lg">
-                        <p class="text-amber-800"><i class="fas fa-car mr-2"></i>The car lease benefit (net reduction of ~₹4.27 Lakhs in taxable income) and standard deduction of ₹50,000 are applied under both regimes in this calculation.</p>
+
+                    <!-- Results Section -->
+                    <div class="mt-8 pt-6 border-t">
+                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h3 class="text-xl font-semibold text-slate-700 mb-4">Tax Calculation Summary</h3>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between p-3 bg-sky-50 rounded-lg">
+                                        <span class="font-semibold text-sky-800">Taxable Income (Old Regime)</span>
+                                        <span id="taxable_old" class="font-bold text-sky-900">₹ 0</span>
+                                    </div>
+                                    <div class="flex justify-between p-3 bg-amber-50 rounded-lg">
+                                        <span class="font-semibold text-amber-800">Taxable Income (New Regime)</span>
+                                        <span id="taxable_new" class="font-bold text-amber-900">₹ 0</span>
+                                    </div>
+                                     <div class="flex justify-between p-4 bg-green-100 border-l-4 border-green-500 rounded-r-lg mt-4">
+                                        <span class="font-bold text-green-800 text-lg">Potential Savings</span>
+                                        <span id="savings_total" class="font-extrabold text-green-700 text-lg">₹ 0</span>
+                                    </div>
+                                </div>
+                            </div>
+                             <div>
+                                <div class="chart-container">
+                                    <canvas id="taxComparisonChart"></canvas>
+                                </div>
+                             </div>
+                        </div>
                     </div>
                 </div>
 
@@ -390,207 +485,182 @@ document.addEventListener('DOMContentLoaded', function () {
     const menuToggle = document.getElementById('menu-toggle');
     const sidebar = document.getElementById('sidebar');
 
-    const formatCurrency = (value) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value).replace('₹', '');
+    const formatCurrency = (value) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
 
-    // Navigation
+    // Main Navigation
     function navigateTo(hash) {
-        navLinks.forEach(link => {
-            link.classList.toggle('active', link.hash === hash);
-        });
-        sections.forEach(section => {
-            section.classList.toggle('active', section.id === hash.substring(1));
-        });
+        navLinks.forEach(link => link.classList.toggle('active', link.hash === hash));
+        sections.forEach(section => section.classList.toggle('active', section.id === hash.substring(1)));
         window.scrollTo(0, 0);
-        if (window.innerWidth < 1024) {
-            sidebar.classList.add('-translate-x-full');
-        }
+        if (window.innerWidth < 1024) sidebar.classList.add('-translate-x-full');
     }
     
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            const hash = e.currentTarget.hash;
-            window.location.hash = hash;
-            navigateTo(hash);
+            navigateTo(e.currentTarget.hash);
+            window.location.hash = e.currentTarget.hash;
         });
     });
-
-    const initialHash = window.location.hash || '#dashboard';
-    navigateTo(initialHash);
     
-    menuToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('-translate-x-full');
-    });
+    menuToggle.addEventListener('click', () => sidebar.classList.toggle('-translate-x-full'));
 
     // Dashboard Charts
     const assetAllocationCtx = document.getElementById('assetAllocationChart').getContext('2d');
     new Chart(assetAllocationCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Equity', 'Debt', 'Gold'],
-            datasets: [{
-                data: [65, 25, 10],
-                backgroundColor: ['#4f46e5', '#16a34a', '#f59e0b'],
-                borderColor: '#f8fafc',
-                borderWidth: 4,
-                hoverOffset: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '70%',
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 20,
-                        font: { size: 14 }
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `${context.label}: ${context.raw}%`;
-                        }
-                    }
-                }
-            }
-        }
+        type: 'doughnut', data: { labels: ['Equity', 'Debt', 'Gold'], datasets: [{ data: [65, 25, 10], backgroundColor: ['#4f46e5', '#16a34a', '#f59e0b'], borderColor: '#f8fafc', borderWidth: 4, hoverOffset: 8 }] },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { padding: 20, font: { size: 14 } } }, tooltip: { callbacks: { label: (c) => `${c.label}: ${c.raw}%` } } } }
     });
 
-    // Tax Comparator
-    const grossSalarySlider = document.getElementById('grossSalary');
-    const hraExemptionSlider = document.getElementById('hraExemption');
-    const chapterVIDeductionsSlider = document.getElementById('chapterVIDeductions');
-
-    const grossSalaryValue = document.getElementById('grossSalaryValue');
-    const hraExemptionValue = document.getElementById('hraExemptionValue');
-    const chapterVIDeductionsValue = document.getElementById('chapterVIDeductionsValue');
+    // Tax Centre Logic
+    const taxTabButtons = document.querySelectorAll('.tax-tab-button');
+    const taxTabs = document.querySelectorAll('.tax-tab');
+    
+    taxTabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            taxTabButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            taxTabs.forEach(tab => tab.classList.toggle('active', tab.id === `tab-${button.dataset.tab}`));
+        });
+    });
+    
+    let propertyCount = 0;
+    document.getElementById('add-property-btn').addEventListener('click', () => {
+        propertyCount++;
+        const propertyCard = `
+            <div id="property-${propertyCount}" class="p-4 border rounded-lg bg-slate-50 relative">
+                <button class="remove-property-btn absolute top-2 right-2 text-red-500 hover:text-red-700" data-id="${propertyCount}">&times;</button>
+                <h4 class="font-semibold mb-2">Property ${propertyCount}</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm">Property Type</label>
+                        <select class="tax-input prop-type">
+                            <option value="let_out">Let Out</option>
+                            <option value="deemed_let_out">Deemed to be Let Out</option>
+                        </select>
+                    </div>
+                    <div><label class="text-sm">Gross Annual Rent (₹)</label><input type="number" class="tax-input prop-rent" value="0"></div>
+                    <div><label class="text-sm">Municipal Taxes Paid (₹)</label><input type="number" class="tax-input prop-tax" value="0"></div>
+                    <div><label class="text-sm">Interest on Loan (₹)</label><input type="number" class="tax-input prop-interest" value="0"></div>
+                </div>
+            </div>`;
+        document.getElementById('property-list').insertAdjacentHTML('beforeend', propertyCard);
+        document.querySelectorAll('.remove-property-btn').forEach(btn => btn.addEventListener('click', (e) => document.getElementById(`property-${e.target.dataset.id}`).remove()));
+    });
 
     let taxChart;
+    const taxForm = document.getElementById('tax-calculator-form');
 
-    function calculateTax(taxableIncome, regime) {
+    function calculateTax(taxableIncome) {
         let tax = 0;
-        const slabs = regime === 'old' 
-            ? [
-                { limit: 250000, rate: 0 },
-                { limit: 500000, rate: 0.05 },
-                { limit: 1000000, rate: 0.20 },
-                { limit: Infinity, rate: 0.30 }
-              ]
-            : [
-                { limit: 300000, rate: 0 },
-                { limit: 600000, rate: 0.05 },
-                { limit: 900000, rate: 0.10 },
-                { limit: 1200000, rate: 0.15 },
-                { limit: 1500000, rate: 0.20 },
-                { limit: Infinity, rate: 0.30 }
-              ];
+        const slabs = taxableIncome <= 700000 ? // New regime default rebate check
+            [ { limit: 300000, rate: 0 }, { limit: 600000, rate: 0.05 }, { limit: 900000, rate: 0.10 }, { limit: 1200000, rate: 0.15 }, { limit: 1500000, rate: 0.20 }, { limit: Infinity, rate: 0.30 } ] :
+            [ { limit: 250000, rate: 0 }, { limit: 500000, rate: 0.05 }, { limit: 1000000, rate: 0.20 }, { limit: Infinity, rate: 0.30 } ];
         
-        let remainingIncome = taxableIncome;
-        let lastLimit = 0;
-        
-        for (const slab of slabs) {
-            if (remainingIncome <= 0) break;
-            const taxableInSlab = Math.min(remainingIncome, slab.limit - lastLimit);
-            tax += taxableInSlab * slab.rate;
-            remainingIncome -= taxableInSlab;
-            lastLimit = slab.limit;
+        const regimeSlabs = taxableIncome > 700000 ? slabs : [
+                { limit: 300000, rate: 0 }, { limit: 600000, rate: 0.05 }, { limit: 700000, rate: 0.10 },
+            ];
+
+        const oldSlabs = [
+            { limit: 250000, rate: 0 }, { limit: 500000, rate: 0.05 }, { limit: 1000000, rate: 0.20 }, { limit: Infinity, rate: 0.30 }
+        ];
+
+        const newSlabs = [
+            { limit: 300000, rate: 0 }, { limit: 600000, rate: 0.05 }, { limit: 900000, rate: 0.10 }, { limit: 1200000, rate: 0.15 }, { limit: 1500000, rate: 0.20 }, { limit: Infinity, rate: 0.30 }
+        ];
+
+        function compute(income, slabSet) {
+            let taxPayable = 0; let lastLimit = 0;
+            for (const slab of slabSet) {
+                if (income > lastLimit) {
+                    const taxableInSlab = Math.min(income - lastLimit, slab.limit - lastLimit);
+                    taxPayable += taxableInSlab * slab.rate;
+                }
+                lastLimit = slab.limit;
+            }
+            //Rebate for new regime
+            if (slabSet === newSlabs && income <= 700000) return 0;
+            return taxPayable + (taxPayable * 0.04); // Add cess
         }
 
-        const cess = tax * 0.04;
-        return tax + cess;
+        return { oldTax: compute(taxableIncome.old, oldSlabs), newTax: compute(taxableIncome.new, newSlabs) };
     }
 
     function updateTaxComparison() {
-        const salary = parseFloat(grossSalarySlider.value);
-        const hra = parseFloat(hraExemptionSlider.value);
-        const chapterVI = parseFloat(chapterVIDeductionsSlider.value);
-        
-        grossSalaryValue.textContent = formatCurrency(salary);
-        hraExemptionValue.textContent = formatCurrency(hra);
-        chapterVIDeductionsValue.textContent = formatCurrency(chapterVI);
+        const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
 
-        const carLeaseBenefit = 427200;
+        const salaryIncome = getVal('basic_salary') + getVal('basic_arrear') + getVal('hra_received') + getVal('hra_arrear') + getVal('lta') + getVal('performance_bonus') + getVal('other_allowance') + getVal('car_perq');
+        
+        let housePropertyIncome = 0;
+        document.querySelectorAll('#property-list > div').forEach(prop => {
+            const rent = parseFloat(prop.querySelector('.prop-rent').value) || 0;
+            const tax = parseFloat(prop.querySelector('.prop-tax').value) || 0;
+            const interest = parseFloat(prop.querySelector('.prop-interest').value) || 0;
+            const nav = rent - tax;
+            housePropertyIncome += (nav - (nav * 0.30) - interest);
+        });
+
+        const otherIncomes = getVal('interest_income') + getVal('any_other_income');
+        const grossTotalIncome = salaryIncome + housePropertyIncome + otherIncomes;
+
+        // Deductions (Old Regime)
         const standardDeduction = 50000;
-        // Assuming ₹4L house property income
-        const housePropertyIncome = 400000;
         
-        const adjustedSalary = salary - carLeaseBenefit;
-        const gti = adjustedSalary + housePropertyIncome;
+        const basicForHRA = getVal('basic_salary') + getVal('basic_arrear');
+        const hraReceived = getVal('hra_received') + getVal('hra_arrear');
+        const rentPaid = getVal('rent_paid');
+        const isMetro = document.getElementById('is_metro').checked;
+        const hraExemption1 = hraReceived;
+        const hraExemption2 = rentPaid - (basicForHRA * 0.1);
+        const hraExemption3 = basicForHRA * (isMetro ? 0.5 : 0.4);
+        const hraExemption = Math.max(0, Math.min(hraExemption1, hraExemption2, hraExemption3));
 
-        const taxableIncomeOld = gti - standardDeduction - hra - chapterVI;
-        const taxableIncomeNew = gti - standardDeduction;
+        const sec80c = Math.min(150000, getVal('lic') + getVal('epf') + getVal('tuition_fees') + getVal('other_80c'));
+        const sec80d = Math.min(25000, getVal('health_insurance_self')) + Math.min(25000, getVal('health_insurance_parents')) + Math.min(50000, getVal('health_insurance_parents_sr'));
+        const sec80tta = Math.min(10000, getVal('interest_80tta'));
+        const profTax = getVal('prof_tax');
+        const chapterVIADeductions = sec80c + sec80d + sec80tta + profTax;
 
-        const taxOld = calculateTax(taxableIncomeOld, 'old');
-        const taxNew = calculateTax(taxableIncomeNew, 'new');
+        const taxableIncomeOld = Math.max(0, grossTotalIncome - standardDeduction - hraExemption - chapterVIADeductions);
+        const taxableIncomeNew = Math.max(0, grossTotalIncome - standardDeduction);
 
+        document.getElementById('taxable_old').textContent = formatCurrency(taxableIncomeOld);
+        document.getElementById('taxable_new').textContent = formatCurrency(taxableIncomeNew);
+
+        const taxes = calculateTax({ old: taxableIncomeOld, new: taxableIncomeNew });
+        const savings = taxes.newTax - taxes.oldTax;
+        
+        document.getElementById('savings_total').textContent = formatCurrency(savings);
+        document.getElementById('estimatedSavings').textContent = formatCurrency(savings);
+        
         if (taxChart) {
-            taxChart.data.datasets[0].data = [taxOld, taxNew];
+            taxChart.data.datasets[0].data = [taxes.oldTax, taxes.newTax];
             taxChart.update();
         }
     }
 
     function createTaxChart() {
-        const taxComparisonCtx = document.getElementById('taxComparisonChart').getContext('2d');
-        taxChart = new Chart(taxComparisonCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Old Regime', 'New Regime'],
-                datasets: [{
-                    label: 'Total Tax Liability',
-                    data: [0, 0],
-                    backgroundColor: ['#38bdf8', '#fb923c'],
-                    borderColor: ['#0284c7', '#ea580c'],
-                    borderWidth: 1,
-                    borderRadius: 5
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                indexAxis: 'y',
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: (context) => `₹ ${formatCurrency(context.raw)}`
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: (value) => `₹ ${formatCurrency(value/100000)}L`
-                        }
-                    }
-                }
-            }
+        const ctx = document.getElementById('taxComparisonChart').getContext('2d');
+        taxChart = new Chart(ctx, {
+            type: 'bar', data: { labels: ['Old Regime', 'New Regime'], datasets: [{ label: 'Total Tax Liability', data: [0, 0], backgroundColor: ['#38bdf8', '#fb923c'], borderWidth: 1, borderRadius: 5 }] },
+            options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => formatCurrency(c.raw) } } }, scales: { x: { beginAtZero: true, ticks: { callback: (v) => `${formatCurrency(v/100000)}L` } } } }
         });
-        updateTaxComparison();
     }
-
-    grossSalarySlider.addEventListener('input', updateTaxComparison);
-    hraExemptionSlider.addEventListener('input', updateTaxComparison);
-    chapterVIDeductionsSlider.addEventListener('input', updateTaxComparison);
+    
+    taxForm.addEventListener('input', updateTaxComparison);
+    createTaxChart();
+    updateTaxComparison(); // Initial calculation
 
     // Emergency Fund Planner
     const monthlyExpensesInput = document.getElementById('monthlyExpenses');
     const emergencyFundTarget = document.getElementById('emergencyFundTarget');
-
-    function updateEmergencyFund() {
-        const expenses = parseFloat(monthlyExpensesInput.value) || 0;
-        const target = expenses * 6;
-        emergencyFundTarget.textContent = '₹ ' + formatCurrency(target);
-    }
-
-    monthlyExpensesInput.addEventListener('input', updateEmergencyFund);
+    monthlyExpensesInput.addEventListener('input', () => {
+        emergencyFundTarget.textContent = formatCurrency((parseFloat(monthlyExpensesInput.value) || 0) * 6);
+    });
     
     // Initial calls
-    createTaxChart();
-    updateEmergencyFund();
+    navigateTo(window.location.hash || '#dashboard');
+    emergencyFundTarget.textContent = formatCurrency((parseFloat(monthlyExpensesInput.value) || 0) * 6);
 });
 </script>
 
