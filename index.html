@@ -287,6 +287,29 @@
                         </div>
                     </div>
 
+                    <!-- Report Management Section -->
+                     <div class="mt-8 pt-6 border-t">
+                        <h3 class="text-xl font-semibold text-slate-700 mb-4">Report Management</h3>
+                        <div class="p-4 bg-slate-100 rounded-lg grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                            <div>
+                                <label for="reportName" class="text-sm font-medium text-slate-600">Report Name</label>
+                                <input type="text" id="reportName" class="tax-input mt-1" placeholder="e.g., FY 2024-25 Plan">
+                            </div>
+                            <div>
+                                <label for="savedReports" class="text-sm font-medium text-slate-600">Saved Reports</label>
+                                <select id="savedReports" class="tax-input mt-1"></select>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button id="saveReportBtn" class="bg-sky-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-sky-600 w-full">Save</button>
+                                <button id="loadReportBtn" class="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 w-full">Load</button>
+                            </div>
+                            <div>
+                                <button id="deleteReportBtn" class="bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600 w-full">Delete Selected</button>
+                            </div>
+                        </div>
+                    </div>
+
+
                     <!-- Results Section -->
                     <div class="mt-8 pt-6 border-t">
                          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
@@ -406,7 +429,7 @@
                                     <p class="font-bold">Strategy: Unbundle Insurance & Investment</p>
                                     <p class="mt-2">Avoid costly, inefficient child plans. Use your term plan for risk cover and invest directly for returns.</p>
                                     <ul class="list-disc list-inside mt-2 space-y-1">
-                                        <li><strong class="text-indigo-600">Investment:</strong> Start a dedicated long-term SIP in diversified equity mutual funds.</li>
+                                        <li><strong class="text-indigo-600">Investment:</strong> Start a dedicated long-term SIP in a diversified equity mutual funds.</li>
                                         <li><strong class="text-indigo-600">Goal:</strong> Earmark this portfolio to build a substantial corpus for higher education.</li>
                                     </ul>
                                 </div>
@@ -513,7 +536,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const formatCurrency = (value) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
 
-    // Main Navigation
     function navigateTo(hash) {
         navLinks.forEach(link => link.classList.toggle('active', link.hash === hash));
         sections.forEach(section => section.classList.toggle('active', section.id === hash.substring(1)));
@@ -531,14 +553,12 @@ document.addEventListener('DOMContentLoaded', function () {
     
     menuToggle.addEventListener('click', () => sidebar.classList.toggle('-translate-x-full'));
 
-    // Dashboard Charts
     const assetAllocationCtx = document.getElementById('assetAllocationChart').getContext('2d');
     new Chart(assetAllocationCtx, {
         type: 'doughnut', data: { labels: ['Equity', 'Debt', 'Gold'], datasets: [{ data: [65, 25, 10], backgroundColor: ['#4f46e5', '#16a34a', '#f59e0b'], borderColor: '#f8fafc', borderWidth: 4, hoverOffset: 8 }] },
         options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { padding: 20, font: { size: 14 } } }, tooltip: { callbacks: { label: (c) => `${c.label}: ${c.raw}%` } } } }
     });
 
-    // Tax Centre Logic
     const taxTabButtons = document.querySelectorAll('.tax-tab-button');
     const taxTabs = document.querySelectorAll('.tax-tab');
     
@@ -551,31 +571,37 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     
     let propertyCount = 0;
-    document.getElementById('add-property-btn').addEventListener('click', () => {
+    const propertyList = document.getElementById('property-list');
+    
+    function addPropertyCard(data = {}) {
         propertyCount++;
-        const propertyCard = `
-            <div id="property-${propertyCount}" class="p-4 border rounded-lg bg-slate-50 relative">
-                <button class="remove-property-btn absolute top-2 right-2 text-red-500 hover:text-red-700 font-bold text-lg" data-id="${propertyCount}">&times;</button>
-                <h4 class="font-semibold mb-2">Property ${propertyCount}</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-sm">Property Type</label>
-                        <select class="tax-input prop-type">
-                            <option value="let_out">Let Out</option>
-                            <option value="deemed_let_out">Deemed to be Let Out</option>
-                        </select>
-                    </div>
-                    <div><label class="text-sm">Gross Annual Rent (₹)</label><input type="number" class="tax-input prop-rent" value="0"></div>
-                    <div><label class="text-sm">Municipal Taxes Paid (₹)</label><input type="number" class="tax-input prop-tax" value="0"></div>
-                    <div><label class="text-sm">Interest on Loan (₹)</label><input type="number" class="tax-input prop-interest" value="0"></div>
+        const card = document.createElement('div');
+        card.className = "p-4 border rounded-lg bg-slate-50 relative";
+        card.id = `property-${propertyCount}`;
+        card.innerHTML = `
+            <button class="remove-property-btn absolute top-2 right-2 text-red-500 hover:text-red-700 font-bold text-lg" data-id="${propertyCount}">&times;</button>
+            <h4 class="font-semibold mb-2">Property ${propertyCount}</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="text-sm">Property Type</label>
+                    <select class="tax-input prop-type">
+                        <option value="let_out" ${data.type === 'let_out' ? 'selected' : ''}>Let Out</option>
+                        <option value="deemed_let_out" ${data.type === 'deemed_let_out' ? 'selected' : ''}>Deemed to be Let Out</option>
+                    </select>
                 </div>
-            </div>`;
-        document.getElementById('property-list').insertAdjacentHTML('beforeend', propertyCard);
-        document.querySelectorAll('.remove-property-btn').forEach(btn => btn.addEventListener('click', (e) => {
+                <div><label class="text-sm">Gross Annual Rent (₹)</label><input type="number" class="tax-input prop-rent" value="${data.rent || 0}"></div>
+                <div><label class="text-sm">Municipal Taxes Paid (₹)</label><input type="number" class="tax-input prop-tax" value="${data.tax || 0}"></div>
+                <div><label class="text-sm">Interest on Loan (₹)</label><input type="number" class="tax-input prop-interest" value="${data.interest || 0}"></div>
+            </div>
+        `;
+        propertyList.appendChild(card);
+        card.querySelector('.remove-property-btn').addEventListener('click', (e) => {
             document.getElementById(`property-${e.target.dataset.id}`).remove();
             updateTaxComparison();
-        }));
-    });
+        });
+    }
+
+    document.getElementById('add-property-btn').addEventListener('click', () => addPropertyCard());
 
     let taxChart;
     const taxForm = document.getElementById('tax-calculator-form');
@@ -609,19 +635,16 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateTaxComparison() {
         const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
 
-        // Salary Calculation
         const basicSalary = getVal('basic_salary') + getVal('basic_arrear');
         const hraReceived = getVal('hra_received') + getVal('hra_arrear');
         const otherSalary = getVal('lta') + getVal('performance_bonus');
         
-        // Allowances & Perks
         const taxableAllowances = getVal('prof_dev_allowance') + getVal('books_allowance') + getVal('tele_allowance') + getVal('health_club_allowance') + getVal('other_allowance');
         const giftVoucherVal = getVal('gift_voucher_value');
         const taxableGift = giftVoucherVal > 5000 ? giftVoucherVal : 0;
-        const taxableSodexo = Math.max(0, getVal('sodexo_value') - 26400);
+        const taxableSodexo = Math.max(0, getVal('sodexo_value') - 26400); 
         const carPerk = getVal('car_perq');
         
-        // Employer Contributions
         const employerPF = getVal('employer_pf_contribution');
         const employerNPS = getVal('employer_nps_contribution');
         const employerSA = getVal('employer_superannuation_contribution');
@@ -632,7 +655,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const salaryIncome = basicSalary + hraReceived + otherSalary + taxableAllowances + taxableGift + taxableSodexo + carPerk + taxableEmployerPF + taxableAggregateContribution;
 
-        // House Property Income
         let housePropertyIncome = 0;
         document.querySelectorAll('#property-list > div').forEach(prop => {
             const rent = parseFloat(prop.querySelector('.prop-rent').value) || 0;
@@ -646,7 +668,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const otherIncomes = getVal('interest_income') + getVal('any_other_income');
         const grossTotalIncome = salaryIncome + housePropertyIncome + otherIncomes;
 
-        // Deductions (Old Regime)
         const standardDeductionSalary = 50000;
         
         const rentPaid = getVal('rent_paid');
@@ -692,17 +713,125 @@ document.addEventListener('DOMContentLoaded', function () {
     taxForm.addEventListener('input', updateTaxComparison);
     createTaxChart();
     
-    // Emergency Fund Planner
     const monthlyExpensesInput = document.getElementById('monthlyExpenses');
     const emergencyFundTarget = document.getElementById('emergencyFundTarget');
     monthlyExpensesInput.addEventListener('input', () => {
         emergencyFundTarget.textContent = formatCurrency((parseFloat(monthlyExpensesInput.value) || 0) * 6);
+    });
+
+    // Report Management Logic
+    const reportNameInput = document.getElementById('reportName');
+    const savedReportsSelect = document.getElementById('savedReports');
+    const saveBtn = document.getElementById('saveReportBtn');
+    const loadBtn = document.getElementById('loadReportBtn');
+    const deleteBtn = document.getElementById('deleteReportBtn');
+
+    function getReports() {
+        return JSON.parse(localStorage.getItem('financialReports')) || {};
+    }
+
+    function saveReports(reports) {
+        localStorage.setItem('financialReports', JSON.stringify(reports));
+    }
+
+    function updateReportList() {
+        const reports = getReports();
+        savedReportsSelect.innerHTML = '';
+        if (Object.keys(reports).length === 0) {
+            savedReportsSelect.innerHTML = '<option>No saved reports</option>';
+            return;
+        }
+        for (const name in reports) {
+            const option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            savedReportsSelect.appendChild(option);
+        }
+    }
+
+    saveBtn.addEventListener('click', () => {
+        const name = reportNameInput.value.trim();
+        if (!name) {
+            alert('Please enter a name for the report.');
+            return;
+        }
+        
+        const reports = getReports();
+        if (Object.keys(reports).length >= 3 && !reports[name]) {
+            alert('You can save a maximum of 3 reports. Please delete an old one or use an existing name to overwrite.');
+            return;
+        }
+
+        const data = { inputs: {}, properties: [] };
+        taxForm.querySelectorAll('input[type="number"], input[type="text"]').forEach(input => {
+            data.inputs[input.id] = input.value;
+        });
+        taxForm.querySelectorAll('input[type="checkbox"]').forEach(input => {
+            data.inputs[input.id] = input.checked;
+        });
+        
+        propertyList.querySelectorAll('.p-4.border.rounded-lg').forEach(card => {
+            data.properties.push({
+                type: card.querySelector('.prop-type').value,
+                rent: card.querySelector('.prop-rent').value,
+                tax: card.querySelector('.prop-tax').value,
+                interest: card.querySelector('.prop-interest').value,
+            });
+        });
+
+        reports[name] = data;
+        saveReports(reports);
+        updateReportList();
+        alert(`Report '${name}' saved successfully!`);
+    });
+
+    loadBtn.addEventListener('click', () => {
+        const name = savedReportsSelect.value;
+        const reports = getReports();
+        if (!reports[name]) {
+            alert('No report selected or report not found.');
+            return;
+        }
+        const data = reports[name];
+
+        reportNameInput.value = name;
+        taxForm.querySelectorAll('input[type="number"], input[type="text"]').forEach(input => {
+            if (data.inputs[input.id] !== undefined) {
+                input.value = data.inputs[input.id];
+            }
+        });
+         taxForm.querySelectorAll('input[type="checkbox"]').forEach(input => {
+            if (data.inputs[input.id] !== undefined) {
+                input.checked = data.inputs[input.id];
+            }
+        });
+
+        propertyList.innerHTML = '';
+        propertyCount = 0;
+        data.properties.forEach(propData => addPropertyCard(propData));
+        
+        updateTaxComparison();
+        alert(`Report '${name}' loaded.`);
+    });
+
+    deleteBtn.addEventListener('click', () => {
+        const name = savedReportsSelect.value;
+        const reports = getReports();
+        if (!reports[name]) {
+            alert('No report selected to delete.');
+            return;
+        }
+        delete reports[name];
+        saveReports(reports);
+        updateReportList();
+        alert(`Report '${name}' deleted.`);
     });
     
     // Initial calls
     navigateTo(window.location.hash || '#dashboard');
     updateTaxComparison(); 
     emergencyFundTarget.textContent = formatCurrency((parseFloat(monthlyExpensesInput.value) || 0) * 6);
+    updateReportList();
 });
 </script>
 
