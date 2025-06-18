@@ -192,7 +192,7 @@
                 <p class="text-slate-500 mb-8">Enter your detailed financial data to get a precise tax comparison and maximize your savings.</p>
                 
                 <div class="bg-white p-6 rounded-lg shadow-md">
-                    <div class="flex space-x-2 border-b mb-6">
+                    <div class="flex flex-wrap space-x-2 border-b mb-6">
                         <button class="tax-tab-button active" data-tab="income">1. Income Details</button>
                         <button class="tax-tab-button" data-tab="property">2. House Property</button>
                         <button class="tax-tab-button" data-tab="deductions">3. Deductions</button>
@@ -200,22 +200,48 @@
                     
                     <div id="tax-calculator-form">
                         <!-- Income Tab -->
-                        <div id="tab-income" class="tax-tab active">
-                            <h3 class="font-semibold text-lg mb-4 text-slate-700">Salary & Other Income</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                <!-- Salary Components -->
-                                <div><label class="text-sm">Basic Salary</label><input type="number" id="basic_salary" class="tax-input" value="1800000"></div>
-                                <div><label class="text-sm">Basic Arrear</label><input type="number" id="basic_arrear" class="tax-input" value="0"></div>
-                                <div><label class="text-sm">HRA Received</label><input type="number" id="hra_received" class="tax-input" value="700000"></div>
-                                <div><label class="text-sm">HRA Arrear</label><input type="number" id="hra_arrear" class="tax-input" value="0"></div>
-                                <div><label class="text-sm">LTA</label><input type="number" id="lta" class="tax-input" value="50000"></div>
-                                <div><label class="text-sm">Performance Bonus</label><input type="number" id="performance_bonus" class="tax-input" value="200000"></div>
-                                <div><label class="text-sm">Other Taxable Allowances</label><input type="number" id="other_allowance" class="tax-input" value="100000"></div>
-                                <!-- Perquisites -->
-                                <div><label class="text-sm">Motor Car Perquisite Value</label><input type="number" id="car_perq" class="tax-input" value="28800"></div>
-                                <!-- Other Income -->
-                                <div><label class="text-sm">Interest Income (Savings, FD)</label><input type="number" id="interest_income" class="tax-input" value="25000"></div>
-                                <div><label class="text-sm">Any Other Income</label><input type="number" id="any_other_income" class="tax-input" value="0"></div>
+                        <div id="tab-income" class="tax-tab active space-y-6">
+                            <div>
+                                <h3 class="font-semibold text-lg mb-4 text-slate-700 border-b pb-2">Salary Components</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <div><label class="text-sm">Basic Salary</label><input type="number" id="basic_salary" class="tax-input" value="1800000"></div>
+                                    <div><label class="text-sm">Basic Arrear</label><input type="number" id="basic_arrear" class="tax-input" value="0"></div>
+                                    <div><label class="text-sm">HRA Received</label><input type="number" id="hra_received" class="tax-input" value="700000"></div>
+                                    <div><label class="text-sm">HRA Arrear</label><input type="number" id="hra_arrear" class="tax-input" value="0"></div>
+                                    <div><label class="text-sm">LTA</label><input type="number" id="lta" class="tax-input" value="50000"></div>
+                                    <div><label class="text-sm">Performance Bonus</label><input type="number" id="performance_bonus" class="tax-input" value="200000"></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h3 class="font-semibold text-lg mb-4 text-slate-700 border-b pb-2">Taxable Allowances & Perquisites</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <div><label class="text-sm">Professional Development</label><input type="number" id="prof_dev_allowance" class="tax-input" value="0"></div>
+                                    <div><label class="text-sm">Books & Periodicals</label><input type="number" id="books_allowance" class="tax-input" value="0"></div>
+                                    <div><label class="text-sm">Telephone/Internet</label><input type="number" id="tele_allowance" class="tax-input" value="0"></div>
+                                    <div><label class="text-sm">Health/Sports Club</label><input type="number" id="health_club_allowance" class="tax-input" value="0"></div>
+                                    <div><label class="text-sm">Gift Voucher Value</label><input type="number" id="gift_voucher_value" class="tax-input" value="0"></div>
+                                    <div><label class="text-sm">Sodexo / Meal Vouchers</label><input type="number" id="sodexo_value" class="tax-input" value="0"></div>
+                                    <div><label class="text-sm">Other Taxable Allowances</label><input type="number" id="other_allowance" class="tax-input" value="100000"></div>
+                                    <div><label class="text-sm">Motor Car Perquisite</label><input type="number" id="car_perq" class="tax-input" value="28800"></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h3 class="font-semibold text-lg mb-4 text-slate-700 border-b pb-2">Employer Contributions</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <div><label class="text-sm">To Provident Fund (PF)</label><input type="number" id="employer_pf_contribution" class="tax-input" value="216000"></div>
+                                    <div><label class="text-sm">To National Pension (NPS)</label><input type="number" id="employer_nps_contribution" class="tax-input" value="0"></div>
+                                    <div><label class="text-sm">To Superannuation</label><input type="number" id="employer_superannuation_contribution" class="tax-input" value="0"></div>
+                                </div>
+                            </div>
+
+                             <div>
+                                <h3 class="font-semibold text-lg mb-4 text-slate-700 border-b pb-2">Other Income Sources</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <div><label class="text-sm">Interest Income (Savings, FD)</label><input type="number" id="interest_income" class="tax-input" value="25000"></div>
+                                    <div><label class="text-sm">Any Other Income</label><input type="number" id="any_other_income" class="tax-input" value="0"></div>
+                                </div>
                             </div>
                         </div>
 
@@ -238,7 +264,7 @@
                                 <div class="space-y-4 p-4 bg-slate-50 rounded-lg">
                                     <h4 class="font-semibold text-slate-600 border-b pb-2">Chapter VI-A (Sec 80C, etc)</h4>
                                     <div><label class="text-sm">Life Insurance Premium</label><input type="number" id="lic" class="tax-input" value="25000"></div>
-                                    <div><label class="text-sm">EPF Contribution</label><input type="number" id="epf" class="tax-input" value="75000"></div>
+                                    <div><label class="text-sm">EPF Contribution (Employee)</label><input type="number" id="epf" class="tax-input" value="75000"></div>
                                     <div><label class="text-sm">Tuition Fees</label><input type="number" id="tuition_fees" class="tax-input" value="80000"></div>
                                     <div><label class="text-sm">Other 80C (PPF, ELSS, etc)</label><input type="number" id="other_80c" class="tax-input" value="0"></div>
                                 </div>
@@ -529,7 +555,7 @@ document.addEventListener('DOMContentLoaded', function () {
         propertyCount++;
         const propertyCard = `
             <div id="property-${propertyCount}" class="p-4 border rounded-lg bg-slate-50 relative">
-                <button class="remove-property-btn absolute top-2 right-2 text-red-500 hover:text-red-700" data-id="${propertyCount}">&times;</button>
+                <button class="remove-property-btn absolute top-2 right-2 text-red-500 hover:text-red-700 font-bold text-lg" data-id="${propertyCount}">&times;</button>
                 <h4 class="font-semibold mb-2">Property ${propertyCount}</h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -545,32 +571,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             </div>`;
         document.getElementById('property-list').insertAdjacentHTML('beforeend', propertyCard);
-        document.querySelectorAll('.remove-property-btn').forEach(btn => btn.addEventListener('click', (e) => document.getElementById(`property-${e.target.dataset.id}`).remove()));
+        document.querySelectorAll('.remove-property-btn').forEach(btn => btn.addEventListener('click', (e) => {
+            document.getElementById(`property-${e.target.dataset.id}`).remove();
+            updateTaxComparison();
+        }));
     });
 
     let taxChart;
     const taxForm = document.getElementById('tax-calculator-form');
 
-    function calculateTax(taxableIncome) {
-        let tax = 0;
-        const slabs = taxableIncome <= 700000 ? // New regime default rebate check
-            [ { limit: 300000, rate: 0 }, { limit: 600000, rate: 0.05 }, { limit: 900000, rate: 0.10 }, { limit: 1200000, rate: 0.15 }, { limit: 1500000, rate: 0.20 }, { limit: Infinity, rate: 0.30 } ] :
-            [ { limit: 250000, rate: 0 }, { limit: 500000, rate: 0.05 }, { limit: 1000000, rate: 0.20 }, { limit: Infinity, rate: 0.30 } ];
-        
-        const regimeSlabs = taxableIncome > 700000 ? slabs : [
-                { limit: 300000, rate: 0 }, { limit: 600000, rate: 0.05 }, { limit: 700000, rate: 0.10 },
-            ];
-
+    function calculateTax({ old: oldIncome, new: newIncome }) {
         const oldSlabs = [
             { limit: 250000, rate: 0 }, { limit: 500000, rate: 0.05 }, { limit: 1000000, rate: 0.20 }, { limit: Infinity, rate: 0.30 }
         ];
-
         const newSlabs = [
             { limit: 300000, rate: 0 }, { limit: 600000, rate: 0.05 }, { limit: 900000, rate: 0.10 }, { limit: 1200000, rate: 0.15 }, { limit: 1500000, rate: 0.20 }, { limit: Infinity, rate: 0.30 }
         ];
 
         function compute(income, slabSet) {
-            let taxPayable = 0; let lastLimit = 0;
+            let taxPayable = 0;
+            let lastLimit = 0;
             for (const slab of slabSet) {
                 if (income > lastLimit) {
                     const taxableInSlab = Math.min(income - lastLimit, slab.limit - lastLimit);
@@ -578,57 +598,79 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 lastLimit = slab.limit;
             }
-            //Rebate for new regime
             if (slabSet === newSlabs && income <= 700000) return 0;
-            return taxPayable + (taxPayable * 0.04); // Add cess
+            const cess = taxPayable * 0.04;
+            return taxPayable + cess;
         }
 
-        return { oldTax: compute(taxableIncome.old, oldSlabs), newTax: compute(taxableIncome.new, newSlabs) };
+        return { oldTax: compute(oldIncome, oldSlabs), newTax: compute(newIncome, newSlabs) };
     }
 
     function updateTaxComparison() {
         const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
 
-        const salaryIncome = getVal('basic_salary') + getVal('basic_arrear') + getVal('hra_received') + getVal('hra_arrear') + getVal('lta') + getVal('performance_bonus') + getVal('other_allowance') + getVal('car_perq');
+        // Salary Calculation
+        const basicSalary = getVal('basic_salary') + getVal('basic_arrear');
+        const hraReceived = getVal('hra_received') + getVal('hra_arrear');
+        const otherSalary = getVal('lta') + getVal('performance_bonus');
         
+        // Allowances & Perks
+        const taxableAllowances = getVal('prof_dev_allowance') + getVal('books_allowance') + getVal('tele_allowance') + getVal('health_club_allowance') + getVal('other_allowance');
+        const giftVoucherVal = getVal('gift_voucher_value');
+        const taxableGift = giftVoucherVal > 5000 ? giftVoucherVal : 0;
+        const taxableSodexo = Math.max(0, getVal('sodexo_value') - 26400);
+        const carPerk = getVal('car_perq');
+        
+        // Employer Contributions
+        const employerPF = getVal('employer_pf_contribution');
+        const employerNPS = getVal('employer_nps_contribution');
+        const employerSA = getVal('employer_superannuation_contribution');
+
+        const taxableEmployerPF = Math.max(0, employerPF - (basicSalary * 0.12));
+        const totalEmployerRetirals = employerPF + employerNPS + employerSA;
+        const taxableAggregateContribution = Math.max(0, totalEmployerRetirals - 750000);
+
+        const salaryIncome = basicSalary + hraReceived + otherSalary + taxableAllowances + taxableGift + taxableSodexo + carPerk + taxableEmployerPF + taxableAggregateContribution;
+
+        // House Property Income
         let housePropertyIncome = 0;
         document.querySelectorAll('#property-list > div').forEach(prop => {
             const rent = parseFloat(prop.querySelector('.prop-rent').value) || 0;
             const tax = parseFloat(prop.querySelector('.prop-tax').value) || 0;
             const interest = parseFloat(prop.querySelector('.prop-interest').value) || 0;
             const nav = rent - tax;
-            housePropertyIncome += (nav - (nav * 0.30) - interest);
+            const standardDeductionHP = nav * 0.30;
+            housePropertyIncome += (nav - standardDeductionHP - interest);
         });
 
         const otherIncomes = getVal('interest_income') + getVal('any_other_income');
         const grossTotalIncome = salaryIncome + housePropertyIncome + otherIncomes;
 
         // Deductions (Old Regime)
-        const standardDeduction = 50000;
+        const standardDeductionSalary = 50000;
         
-        const basicForHRA = getVal('basic_salary') + getVal('basic_arrear');
-        const hraReceived = getVal('hra_received') + getVal('hra_arrear');
         const rentPaid = getVal('rent_paid');
         const isMetro = document.getElementById('is_metro').checked;
         const hraExemption1 = hraReceived;
-        const hraExemption2 = rentPaid - (basicForHRA * 0.1);
-        const hraExemption3 = basicForHRA * (isMetro ? 0.5 : 0.4);
+        const hraExemption2 = rentPaid - (basicSalary * 0.1);
+        const hraExemption3 = basicSalary * (isMetro ? 0.5 : 0.4);
         const hraExemption = Math.max(0, Math.min(hraExemption1, hraExemption2, hraExemption3));
 
         const sec80c = Math.min(150000, getVal('lic') + getVal('epf') + getVal('tuition_fees') + getVal('other_80c'));
         const sec80d = Math.min(25000, getVal('health_insurance_self')) + Math.min(25000, getVal('health_insurance_parents')) + Math.min(50000, getVal('health_insurance_parents_sr'));
         const sec80tta = Math.min(10000, getVal('interest_80tta'));
         const profTax = getVal('prof_tax');
-        const chapterVIADeductions = sec80c + sec80d + sec80tta + profTax;
+        
+        const totalDeductionsOld = standardDeductionSalary + hraExemption + sec80c + sec80d + sec80tta + profTax;
 
-        const taxableIncomeOld = Math.max(0, grossTotalIncome - standardDeduction - hraExemption - chapterVIADeductions);
-        const taxableIncomeNew = Math.max(0, grossTotalIncome - standardDeduction);
+        const taxableIncomeOld = Math.max(0, grossTotalIncome - totalDeductionsOld);
+        const taxableIncomeNew = Math.max(0, grossTotalIncome - standardDeductionSalary);
 
         document.getElementById('taxable_old').textContent = formatCurrency(taxableIncomeOld);
         document.getElementById('taxable_new').textContent = formatCurrency(taxableIncomeNew);
 
         const taxes = calculateTax({ old: taxableIncomeOld, new: taxableIncomeNew });
-        const savings = taxes.newTax - taxes.oldTax;
+        const savings = Math.max(0, taxes.newTax - taxes.oldTax);
         
         document.getElementById('savings_total').textContent = formatCurrency(savings);
         document.getElementById('estimatedSavings').textContent = formatCurrency(savings);
@@ -649,8 +691,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
     taxForm.addEventListener('input', updateTaxComparison);
     createTaxChart();
-    updateTaxComparison(); // Initial calculation
-
+    
     // Emergency Fund Planner
     const monthlyExpensesInput = document.getElementById('monthlyExpenses');
     const emergencyFundTarget = document.getElementById('emergencyFundTarget');
@@ -660,6 +701,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Initial calls
     navigateTo(window.location.hash || '#dashboard');
+    updateTaxComparison(); 
     emergencyFundTarget.textContent = formatCurrency((parseFloat(monthlyExpensesInput.value) || 0) * 6);
 });
 </script>
