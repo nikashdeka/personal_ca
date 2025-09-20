@@ -352,7 +352,7 @@
               </div>
               <div
                 id="aiStatus"
-                class="mt-2 text-sm font-medium text-slate-600"
+                class="mt-2 text-sm font-sm text-slate-600"
               ></div>
             </div>
 
@@ -937,6 +937,59 @@
                       </div>
                   </div>
               </section>
+              
+              <div class="mt-8 pt-6 border-t financial-planner-card p-6">
+                  <h3 class="text-xl font-semibold text-slate-700 mb-4">
+                      Save & Load Financial Plan
+                  </h3>
+                  <div
+                    class="p-4 bg-slate-100 rounded-lg grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end"
+                  >
+                    <div>
+                      <label
+                        for="fpReportName"
+                        class="text-sm font-medium text-slate-600"
+                        >Report Name</label
+                      >
+                      <input
+                        type="text"
+                        id="fpReportName"
+                        class="tax-input mt-1"
+                        placeholder="e.g., Monthly Budget"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        for="fpSavedReports"
+                        class="text-sm font-medium text-slate-600"
+                        >Saved Reports</label
+                      >
+                      <select id="fpSavedReports" class="tax-input mt-1"></select>
+                    </div>
+                    <div class="flex space-x-2">
+                      <button
+                        id="fpSaveReportBtn"
+                        class="bg-sky-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-sky-600 w-full"
+                      >
+                        Save
+                      </button>
+                      <button
+                        id="fpLoadReportBtn"
+                        class="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 w-full"
+                      >
+                        Load
+                      </button>
+                    </div>
+                    <div>
+                      <button
+                        id="fpDeleteReportBtn"
+                        class="bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600 w-full"
+                      >
+                        Delete Selected
+                      </button>
+                    </div>
+                  </div>
+              </div>
 
               <section class="mt-12">
                   <h2 class="text-3xl font-bold text-center mb-8 text-slate-800">Wealth Building Insights</h2>
@@ -2013,7 +2066,7 @@
         // START of Integrated Financial Planner Logic
         // ====================================================================
 
-        const financialData = {
+        let financialData = {
             income: [
                 { description: 'Your Net Salary', amount: 200000 },
             ],
@@ -2227,8 +2280,97 @@
         }
 
         // ====================================================================
-        // END of Integrated Financial Planner Logic
+        // START of Persistent Storage Logic for Financial Planner
         // ====================================================================
+
+        const fpReportNameInput = document.getElementById("fpReportName");
+        const fpSavedReportsSelect = document.getElementById("fpSavedReports");
+        const fpSaveBtn = document.getElementById("fpSaveReportBtn");
+        const fpLoadBtn = document.getElementById("fpLoadReportBtn");
+        const fpDeleteBtn = document.getElementById("fpDeleteReportBtn");
+
+        function getFPReports() {
+            try {
+                return JSON.parse(localStorage.getItem("fpFinancialReports")) || {};
+            } catch (e) {
+                console.error("Failed to parse financial reports from localStorage:", e);
+                return {};
+            }
+        }
+
+        function saveFPReports(reports) {
+            localStorage.setItem("fpFinancialReports", JSON.stringify(reports));
+        }
+
+        function updateFPReportList() {
+            const reports = getFPReports();
+            fpSavedReportsSelect.innerHTML = "";
+            if (Object.keys(reports).length === 0) {
+                fpSavedReportsSelect.innerHTML = "<option>No saved reports</option>";
+                fpLoadBtn.disabled = true;
+                fpDeleteBtn.disabled = true;
+                return;
+            }
+            fpLoadBtn.disabled = false;
+            fpDeleteBtn.disabled = false;
+            for (const name in reports) {
+                const option = document.createElement("option");
+                option.value = name;
+                option.textContent = name;
+                fpSavedReportsSelect.appendChild(option);
+            }
+        }
+
+        fpSaveBtn.addEventListener("click", () => {
+            const name = fpReportNameInput.value.trim();
+            if (!name) {
+                showAlert("Please enter a name for the report.");
+                return;
+            }
+
+            const reports = getFPReports();
+            if (Object.keys(reports).length >= 3 && !reports[name]) {
+                showAlert(
+                    "You can save a maximum of 3 financial plans. Please delete an old one or use an existing name to overwrite."
+                );
+                return;
+            }
+
+            reports[name] = financialData;
+            saveFPReports(reports);
+            updateFPReportList();
+            showAlert(`Financial plan '${name}' saved successfully!`);
+        });
+
+        fpLoadBtn.addEventListener("click", () => {
+            const name = fpSavedReportsSelect.value;
+            const reports = getFPReports();
+            if (!reports[name]) {
+                showAlert("No report selected or report not found.");
+                return;
+            }
+            
+            financialData = JSON.parse(JSON.stringify(reports[name]));
+            updateFinancialDashboard();
+            showAlert(`Financial plan '${name}' loaded.`);
+        });
+
+        fpDeleteBtn.addEventListener("click", () => {
+            const name = fpSavedReportsSelect.value;
+            const reports = getFPReports();
+            if (!reports[name]) {
+                showAlert("No report selected to delete.");
+                return;
+            }
+            delete reports[name];
+            saveFPReports(reports);
+            updateFPReportList();
+            showAlert(`Financial plan '${name}' deleted.`);
+        });
+        // ====================================================================
+        // END of Persistent Storage Logic for Financial Planner
+        // ====================================================================
+
 
         // Initial calls
         navigateTo(window.location.hash || "#dashboard");
@@ -2237,7 +2379,10 @@
           (parseFloat(monthlyExpensesInput.value) || 0) * 6
         );
         updateReportList();
+        
+        // This function will render the financial planner dashboard on page load
         updateFinancialDashboard();
+        updateFPReportList();
 
         // Add event listeners for the financial planner tables
         document.querySelectorAll('.add-item-btn').forEach(button => {
