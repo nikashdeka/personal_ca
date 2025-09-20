@@ -2105,12 +2105,15 @@
             }
         }
         
-        // This function is now part of the event listener's callback
         function handleDeleteItem(event) {
-            const { type, index } = event.currentTarget.dataset;
-            if (type && index) {
-                financialData[type].splice(index, 1);
-                updateFinancialDashboard();
+            const deleteButton = event.target.closest('.delete-item-btn');
+            if (deleteButton) {
+                const type = deleteButton.dataset.type;
+                const index = deleteButton.dataset.index;
+                if (type && index) {
+                    financialData[type].splice(index, 1);
+                    updateFinancialDashboard();
+                }
             }
         }
 
@@ -2241,14 +2244,9 @@
             button.addEventListener('click', handleAddItem);
         });
 
-        // Use event delegation for both update and delete
         document.querySelectorAll('.financial-planner-card tbody').forEach(tbody => {
             tbody.addEventListener('input', handleFinancialTableChange);
-            tbody.addEventListener('click', (event) => {
-                if (event.target.closest('.delete-item-btn')) {
-                    handleDeleteItem(event);
-                }
-            });
+            tbody.addEventListener('click', handleDeleteItem);
         });
       });
     </script>
