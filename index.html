@@ -886,7 +886,7 @@
 
               <section id="data-entry">
                   <h2 class="text-3xl font-bold text-center mb-8 text-slate-800">Manage Your Finances</h2>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                       
                       <div class="financial-planner-card p-6">
                           <h3 class="text-xl font-semibold mb-4">Income Sources</h3>
@@ -908,6 +908,24 @@
                           <div class="mt-4 flex gap-2" data-type="savings">
                               <input type="text" placeholder="Description" class="w-2/3 tax-input" id="newSavingsDesc">
                               <input type="number" placeholder="Amount (₹)" class="w-1/3 tax-input" id="newSavingsAmount">
+                              <button class="btn-primary px-4 py-2 rounded-md font-semibold text-sm add-item-btn">Add</button>
+                          </div>
+                      </div>
+
+                      <div class="financial-planner-card p-6 lg:col-span-1">
+                          <h3 class="text-xl font-semibold mb-4">Credit Card Transactions</h3>
+                          <p class="text-sm text-slate-600 mb-4">Add your credit card expenses here. They will be automatically categorized below.</p>
+                          <table class="w-full text-left">
+                              <tbody id="ccTransactionsTableBody" data-type="creditCardTransactions"></tbody>
+                          </table>
+                          <div class="mt-4 flex gap-2" data-type="creditCardTransactions">
+                              <input type="text" placeholder="Description" class="w-1/2 tax-input" id="newCCTransactionDesc">
+                              <input type="number" placeholder="Amount (₹)" class="w-1/4 tax-input" id="newCCTransactionAmount">
+                              <select class="w-1/4 tax-input" id="newCCTransactionCategory">
+                                  <option value="">Category</option>
+                                  <option value="fixedExpenses">Fixed</option>
+                                  <option value="variableExpenses">Variable</option>
+                              </select>
                               <button class="btn-primary px-4 py-2 rounded-md font-semibold text-sm add-item-btn">Add</button>
                           </div>
                       </div>
@@ -2090,7 +2108,15 @@
             savings: [
                 { description: 'SG Investment', amount: 70000.00 },
                 { description: 'SBI Securities', amount: 5000.00 }
-            ]
+            ],
+            creditCardTransactions: []
+        };
+
+        const transactionMapping = {
+            'airtel': 'fixedExpenses',
+            'petrol': 'variableExpenses',
+            'school fees': 'variableExpenses',
+            'insurance': 'fixedExpenses'
         };
 
         let overviewChart, expenseChart;
@@ -2103,12 +2129,22 @@
             financialData[type].forEach((item, index) => {
                 const row = document.createElement('tr');
                 row.className = 'border-b border-gray-200 table-row-hover';
+                
+                let descriptionInput = `<input type="text" value="${item.description}" class="w-full bg-transparent tax-input" data-field="description" data-type="${type}" data-index="${index}">`;
+                let amountInput = `<input type="number" value="${item.amount}" class="w-full bg-transparent text-right tax-input" data-field="amount" data-type="${type}" data-index="${index}">`;
+
+                if (type === 'creditCardTransactions') {
+                    // Credit card transactions are read-only
+                    descriptionInput = `<span>${item.description}</span>`;
+                    amountInput = `<span class="text-right">${formatCurrencyWithDecimal(item.amount)}</span>`;
+                }
+
                 row.innerHTML = `
                     <td class="py-2 pr-2">
-                        <input type="text" value="${item.description}" class="w-full bg-transparent tax-input" data-field="description" data-type="${type}" data-index="${index}">
+                        ${descriptionInput}
                     </td>
                     <td class="py-2 pr-2">
-                        <input type="number" value="${item.amount}" class="w-full bg-transparent text-right tax-input" data-field="amount" data-type="${type}" data-index="${index}">
+                        ${amountInput}
                     </td>
                     <td class="py-2 w-10">
                         <button class="btn-danger p-1 rounded-full text-xs delete-item-btn" data-type="${type}" data-index="${index}">
@@ -2125,17 +2161,30 @@
             if (!container) return;
             
             const type = container.dataset.type;
-            const descInput = container.querySelector(`input[id^="new"][type="text"]`);
-            const amountInput = container.querySelector(`input[id^="new"][type="number"]`);
+            let description, amount, category;
 
-            if (descInput && amountInput) {
-                const description = descInput.value.trim();
-                const amount = parseFloat(amountInput.value);
+            if (type === 'creditCardTransactions') {
+                description = document.getElementById('newCCTransactionDesc').value.trim();
+                amount = parseFloat(document.getElementById('newCCTransactionAmount').value);
+                category = document.getElementById('newCCTransactionCategory').value;
+
+                if (description && !isNaN(amount) && amount >= 0 && category) {
+                    financialData.creditCardTransactions.push({ description, amount, category });
+                    document.getElementById('newCCTransactionDesc').value = '';
+                    document.getElementById('newCCTransactionAmount').value = '';
+                    document.getElementById('newCCTransactionCategory').value = '';
+                    updateFinancialDashboard();
+                } else {
+                    showAlert('Please enter a valid description, positive amount, and select a category.');
+                }
+            } else {
+                description = container.querySelector(`input[id^="new"][type="text"]`).value.trim();
+                amount = parseFloat(container.querySelector(`input[id^="new"][type="number"]`).value);
 
                 if(description && !isNaN(amount) && amount >= 0) {
                     financialData[type].push({ description, amount });
-                    descInput.value = '';
-                    amountInput.value = '';
+                    container.querySelector(`input[id^="new"][type="text"]`).value = '';
+                    container.querySelector(`input[id^="new"][type="number"]`).value = '';
                     updateFinancialDashboard();
                 } else {
                     showAlert('Please enter a valid description and a positive amount.');
@@ -2153,8 +2202,11 @@
             }
 
             if (type && index && field) {
-                financialData[type][index][field] = value;
-                updateFinancialDashboard();
+                // Ensure credit card transactions are read-only
+                if (type !== 'creditCardTransactions') {
+                    financialData[type][index][field] = value;
+                    updateFinancialDashboard();
+                }
             }
         }
         
@@ -2172,12 +2224,18 @@
 
         function calculateFinancialTotals() {
             const totalIncome = financialData.income.reduce((sum, item) => sum + item.amount, 0);
+
+            // Calculate total expenses from all sources
             const totalFixedExpenses = financialData.fixedExpenses.reduce((sum, item) => sum + item.amount, 0);
             const totalVariableExpenses = financialData.variableExpenses.reduce((sum, item) => sum + item.amount, 0);
-            const totalExpenses = totalFixedExpenses + totalVariableExpenses;
+            const totalCCTransactions = financialData.creditCardTransactions.reduce((sum, item) => sum + item.amount, 0);
+
+            const totalExpenses = totalFixedExpenses + totalVariableExpenses + totalCCTransactions;
+            
             const totalSavings = financialData.savings.reduce((sum, item) => sum + item.amount, 0);
             const netSurplus = totalIncome - totalExpenses - totalSavings;
-            return { totalIncome, totalExpenses, totalSavings, netSurplus, totalFixedExpenses, totalVariableExpenses };
+
+            return { totalIncome, totalExpenses, totalSavings, netSurplus, totalFixedExpenses, totalVariableExpenses, totalCCTransactions };
         }
 
         function updateFinancialDashboard() {
@@ -2241,7 +2299,19 @@
                 }
             }
 
-            const allExpenses = [...financialData.fixedExpenses, ...financialData.variableExpenses].filter(e => e.amount > 0);
+            // Grouping credit card expenses by category
+            const groupedCreditCardExpenses = financialData.creditCardTransactions.reduce((acc, curr) => {
+                const category = curr.category || 'variableExpenses'; // Default to variable if no category is specified
+                acc[category] = (acc[category] || 0) + curr.amount;
+                return acc;
+            }, {});
+
+            const allExpenses = [
+                ...financialData.fixedExpenses, 
+                ...financialData.variableExpenses, 
+                ...financialData.creditCardTransactions
+            ].filter(e => e.amount > 0).sort((a, b) => b.amount - a.amount);
+            
             const expenseData = {
                 labels: allExpenses.map(e => e.description),
                 datasets: [{
