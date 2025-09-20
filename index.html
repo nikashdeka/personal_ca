@@ -10,10 +10,6 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     />
-    <!-- Chosen Palette: Calm Harmony (Warm Neutrals with Blue/Green Accent) -->
-    <!-- Application Structure Plan: A dashboard-style SPA with side navigation to thematic sections (Dashboard, Tax Centre, Financial Fortress, Wealth Engine, Action Plan). This non-linear structure empowers the user to explore topics based on their immediate needs, while interactive calculators and charts make complex financial concepts tangible and personalized. This is superior to a static report for engagement and understanding. -->
-    <!-- Visualization & Content Choices: [Tax Comparison -> Bar Chart (Chart.js) -> Interactive sliders -> Clearly visualizes savings], [Asset Allocation -> Donut Chart (Chart.js) -> Hover reveals details -> Quick visual understanding of portfolio mix], [Deductions -> Interactive HTML Cards -> Click to expand -> Breaks down complex info into digestible parts], [Calculators -> HTML Forms + JS -> User inputs data -> Provides personalized, actionable numbers]. This approach uses the best tool for each piece of information to maximize clarity and interaction. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
       body {
         font-family: "Inter", sans-serif;
@@ -104,10 +100,47 @@
         width: 90%;
         text-align: center;
       }
+      
+      /* New Financial Planner Styles */
+      .financial-planner-card {
+        background-color: white;
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .financial-planner-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+      }
+      .btn-primary {
+        background-color: #5A6F64; /* Soothing Sage */
+        color: white;
+      }
+      .btn-primary:hover {
+        background-color: #4B5D54;
+      }
+      .btn-danger {
+        background-color: #E57373;
+        color: white;
+      }
+      .btn-danger:hover {
+        background-color: #EF5350;
+      }
+      .table-row-hover:hover {
+        background-color: #f7f7f7;
+      }
+      .fp-chart-container {
+        position: relative;
+        width: 100%;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+        height: 300px;
+        max-height: 350px;
+      }
     </style>
   </head>
   <body class="bg-slate-50 text-slate-800">
-    <!-- Alert Modal -->
     <div id="alertModal" class="modal-backdrop">
       <div class="modal-content">
         <h3 id="modalTitle" class="text-xl font-bold mb-4">Notification</h3>
@@ -122,7 +155,6 @@
     </div>
 
     <div class="flex min-h-screen">
-      <!-- Sidebar Navigation -->
       <aside
         id="sidebar"
         class="bg-white w-64 p-4 shadow-lg fixed lg:relative -translate-x-full lg:translate-x-0 transition-transform duration-300 z-20"
@@ -147,6 +179,12 @@
             <i class="fas fa-calculator w-6 text-center mr-3"></i> Tax Centre
           </a>
           <a
+            href="#financial-planner"
+            class="nav-item flex items-center p-3 my-1 rounded-lg hover:bg-slate-100 transition-colors duration-200"
+          >
+            <i class="fas fa-wallet w-6 text-center mr-3"></i> Financial Planner
+          </a>
+          <a
             href="#fortress"
             class="nav-item flex items-center p-3 my-1 rounded-lg hover:bg-slate-100 transition-colors duration-200"
           >
@@ -168,7 +206,6 @@
         </nav>
       </aside>
 
-      <!-- Main Content -->
       <main class="flex-1 p-4 md:p-8 lg:p-10 bg-slate-50">
         <button
           id="menu-toggle"
@@ -177,7 +214,6 @@
           <i class="fas fa-bars"></i>
         </button>
 
-        <!-- Dashboard Section -->
         <section id="dashboard" class="tab-content active">
           <h2 class="text-3xl font-bold text-slate-800 mb-2">
             Your Financial Dashboard
@@ -188,7 +224,6 @@
           </p>
 
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            <!-- Key Recommendation Card -->
             <div class="kpi-card xl:col-span-2">
               <div class="flex items-center text-amber-500 mb-3">
                 <i class="fas fa-star text-2xl mr-3"></i>
@@ -214,7 +249,6 @@
               </div>
             </div>
 
-            <!-- Life Insurance Card -->
             <div class="kpi-card">
               <div class="flex items-center text-sky-500 mb-3">
                 <i class="fas fa-heart-pulse text-2xl mr-3"></i>
@@ -232,7 +266,6 @@
               </div>
             </div>
 
-            <!-- Asset Allocation Card -->
             <div class="kpi-card">
               <div class="flex items-center text-indigo-500 mb-3">
                 <i class="fas fa-chart-pie text-2xl mr-3"></i>
@@ -248,7 +281,6 @@
               </div>
             </div>
 
-            <!-- Emergency Fund Card -->
             <div class="kpi-card">
               <div class="flex items-center text-emerald-500 mb-3">
                 <i class="fas fa-suitcase-medical text-2xl mr-3"></i>
@@ -267,7 +299,6 @@
               </div>
             </div>
 
-            <!-- Next Step Card -->
             <div class="kpi-card bg-sky-500 text-white">
               <div class="flex items-center mb-3">
                 <i class="fas fa-arrow-right text-2xl mr-3"></i>
@@ -287,7 +318,6 @@
           </div>
         </section>
 
-        <!-- Tax Centre Section -->
         <section id="tax-centre" class="tab-content">
           <h2 class="text-3xl font-bold text-slate-800 mb-2">Tax Centre</h2>
           <p class="text-slate-500 mb-8">
@@ -296,7 +326,6 @@
           </p>
 
           <div class="bg-white p-6 rounded-lg shadow-md">
-            <!-- Payslip Uploader -->
             <div class="mb-8 p-4 bg-sky-50 border border-sky-200 rounded-lg">
               <h3 class="text-xl font-semibold text-slate-700 mb-2">
                 Payslip Analyzer (AI)
@@ -340,7 +369,6 @@
             </div>
 
             <div id="tax-calculator-form">
-              <!-- Income Tab -->
               <div id="tab-income" class="tax-tab active space-y-6">
                 <div>
                   <h3
@@ -581,7 +609,6 @@
                 </div>
               </div>
 
-              <!-- House Property Tab -->
               <div id="tab-property" class="tax-tab">
                 <div class="flex justify-between items-center mb-4">
                   <h3 class="font-semibold text-lg text-slate-700">
@@ -595,11 +622,9 @@
                   </button>
                 </div>
                 <div id="property-list" class="space-y-4">
-                  <!-- Property Cards will be injected here -->
-                </div>
+                  </div>
               </div>
 
-              <!-- Deductions Tab -->
               <div id="tab-deductions" class="tax-tab">
                 <h3 class="font-semibold text-lg mb-4 text-slate-700">
                   Tax Saving Deductions (for Old Regime)
@@ -607,7 +632,6 @@
                 <div
                   class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
-                  <!-- 80C -->
                   <div class="space-y-4 p-4 bg-slate-50 rounded-lg">
                     <h4 class="font-semibold text-slate-600 border-b pb-2">
                       Section 80C Investments
@@ -644,7 +668,6 @@
                       the 80C calculation.
                     </p>
                   </div>
-                  <!-- 80D -->
                   <div class="space-y-4 p-4 bg-slate-50 rounded-lg">
                     <h4 class="font-semibold text-slate-600 border-b pb-2">
                       Health (Sec 80D)
@@ -680,7 +703,6 @@
                       />
                     </div>
                   </div>
-                  <!-- Other Deductions -->
                   <div class="space-y-4 p-4 bg-slate-50 rounded-lg">
                     <h4 class="font-semibold text-slate-600 border-b pb-2">
                       Other Deductions & Exemptions
@@ -718,7 +740,6 @@
               </div>
             </div>
 
-            <!-- Report Management Section -->
             <div class="mt-8 pt-6 border-t">
               <h3 class="text-xl font-semibold text-slate-700 mb-4">
                 Report Management
@@ -772,7 +793,6 @@
               </div>
             </div>
 
-            <!-- Results Section -->
             <div class="mt-8 pt-6 border-t">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 <div>
@@ -821,8 +841,119 @@
             </div>
           </div>
         </section>
+        
+        <section id="financial-planner" class="tab-content">
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">Personal Financial Planner</h2>
+            <p class="text-slate-500 mb-8">
+                Your interactive tool to track income, manage expenses, and see your financial health in real-time.
+            </p>
+            <main>
+              <section id="kpis" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                  <div class="financial-planner-card p-6 flex flex-col justify-center items-center">
+                      <h2 class="text-lg font-semibold text-slate-500">Total Income</h2>
+                      <p id="totalIncome" class="text-3xl font-bold text-green-600 mt-2">₹0.00</p>
+                  </div>
+                  <div class="financial-planner-card p-6 flex flex-col justify-center items-center">
+                      <h2 class="text-lg font-semibold text-slate-500">Total Expenses</h2>
+                      <p id="totalExpenses" class="text-3xl font-bold text-red-600 mt-2">₹0.00</p>
+                  </div>
+                  <div class="financial-planner-card p-6 flex flex-col justify-center items-center">
+                      <h2 class="text-lg font-semibold text-slate-500">Total Savings</h2>
+                      <p id="totalSavings" class="text-3xl font-bold text-blue-600 mt-2">₹0.00</p>
+                  </div>
+                  <div class="financial-planner-card p-6 flex flex-col justify-center items-center">
+                      <h2 id="netSurplusTitle" class="text-lg font-semibold text-slate-500">Net Surplus</h2>
+                      <p id="netSurplus" class="text-3xl font-bold text-slate-800 mt-2">₹0.00</p>
+                  </div>
+              </section>
 
-        <!-- Financial Fortress Section -->
+              <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                  <div class="financial-planner-card p-6">
+                      <h3 class="text-xl font-semibold text-center mb-4">Financial Overview</h3>
+                      <p class="text-center text-sm text-slate-500 mb-4">This chart shows the allocation of your total income. A larger savings slice is the primary driver of wealth creation.</p>
+                      <div class="fp-chart-container">
+                          <canvas id="overviewChart"></canvas>
+                      </div>
+                  </div>
+                  <div class="financial-planner-card p-6">
+                      <h3 class="text-xl font-semibold text-center mb-4">Expense Breakdown</h3>
+                      <p class="text-center text-sm text-slate-500 mb-4">This chart highlights your largest spending categories. Identifying these is the first step to optimizing your budget.</p>
+                      <div class="fp-chart-container h-[350px] md:h-[400px] max-h-[450px]">
+                          <canvas id="expenseChart"></canvas>
+                      </div>
+                  </div>
+              </section>
+
+              <section id="data-entry">
+                  <h2 class="text-3xl font-bold text-center mb-8 text-slate-800">Manage Your Finances</h2>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      
+                      <div class="financial-planner-card p-6">
+                          <h3 class="text-xl font-semibold mb-4">Income Sources</h3>
+                          <table class="w-full text-left">
+                              <tbody id="incomeTableBody" data-type="income"></tbody>
+                          </table>
+                          <div class="mt-4 flex gap-2" data-type="income">
+                              <input type="text" placeholder="Description" class="w-2/3 tax-input" id="newIncomeDesc">
+                              <input type="number" placeholder="Amount (₹)" class="w-1/3 tax-input" id="newIncomeAmount">
+                              <button class="btn-primary px-4 py-2 rounded-md font-semibold text-sm add-item-btn">Add</button>
+                          </div>
+                      </div>
+
+                      <div class="financial-planner-card p-6">
+                          <h3 class="text-xl font-semibold mb-4">Savings & Investments</h3>
+                          <table class="w-full text-left">
+                              <tbody id="savingsTableBody" data-type="savings"></tbody>
+                          </table>
+                          <div class="mt-4 flex gap-2" data-type="savings">
+                              <input type="text" placeholder="Description" class="w-2/3 tax-input" id="newSavingsDesc">
+                              <input type="number" placeholder="Amount (₹)" class="w-1/3 tax-input" id="newSavingsAmount">
+                              <button class="btn-primary px-4 py-2 rounded-md font-semibold text-sm add-item-btn">Add</button>
+                          </div>
+                      </div>
+
+                      <div class="financial-planner-card p-6">
+                          <h3 class="text-xl font-semibold mb-4">Fixed Expenses</h3>
+                          <table class="w-full text-left">
+                              <tbody id="fixedExpensesTableBody" data-type="fixedExpenses"></tbody>
+                          </table>
+                          <div class="mt-4 flex gap-2" data-type="fixedExpenses">
+                              <input type="text" placeholder="Description" class="w-2/3 tax-input" id="newFixedDesc">
+                              <input type="number" placeholder="Amount (₹)" class="w-1/3 tax-input" id="newFixedAmount">
+                              <button class="btn-primary px-4 py-2 rounded-md font-semibold text-sm add-item-btn">Add</button>
+                          </div>
+                      </div>
+                      
+                      <div class="financial-planner-card p-6">
+                          <h3 class="text-xl font-semibold mb-4">Variable Expenses</h3>
+                          <table class="w-full text-left">
+                              <tbody id="variableExpensesTableBody" data-type="variableExpenses"></tbody>
+                          </table>
+                          <div class="mt-4 flex gap-2" data-type="variableExpenses">
+                              <input type="text" placeholder="Description" class="w-2/3 tax-input" id="newVariableDesc">
+                              <input type="number" placeholder="Amount (₹)" class="w-1/3 tax-input" id="newVariableAmount">
+                              <button class="btn-primary px-4 py-2 rounded-md font-semibold text-sm add-item-btn">Add</button>
+                          </div>
+                      </div>
+                  </div>
+              </section>
+
+              <section class="mt-12">
+                  <h2 class="text-3xl font-bold text-center mb-8 text-slate-800">Wealth Building Insights</h2>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div class="financial-planner-card p-6">
+                          <h3 class="text-xl font-semibold mb-3">The 50/30/20 Rule</h3>
+                          <p class="text-slate-600">A simple yet powerful budgeting guideline. Allocate 50% of your after-tax income to **Needs** (rent, groceries, utilities), 30% to **Wants** (dining out, hobbies, entertainment), and a crucial 20% to **Savings & Investments**. This dashboard helps you see how your spending aligns with this wealth-building framework.</p>
+                      </div>
+                      <div class="financial-planner-card p-6">
+                          <h3 class="text-xl font-semibold mb-3">Pay Yourself First</h3>
+                          <p class="text-slate-600">The most effective strategy for building wealth is to treat your savings and investments as a non-negotiable "bill." Before you pay for rent or groceries, allocate a portion of your income to your investment accounts. Automate this process to build financial discipline effortlessly.</p>
+                      </div>
+                  </div>
+              </section>
+          </main>
+        </section>
+
         <section id="fortress" class="tab-content">
           <h2 class="text-3xl font-bold text-slate-800 mb-2">
             Financial Fortress
@@ -833,7 +964,6 @@
           </p>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Insurance Hub -->
             <div class="bg-white p-6 rounded-lg shadow-md">
               <h3 class="text-xl font-semibold text-slate-700 mb-4">
                 Insurance Hub
@@ -894,7 +1024,6 @@
               </div>
             </div>
 
-            <!-- Emergency Fund Planner -->
             <div class="bg-white p-6 rounded-lg shadow-md">
               <h3 class="text-xl font-semibold text-slate-700 mb-4">
                 Emergency Fund Planner
@@ -935,7 +1064,6 @@
           </div>
         </section>
 
-        <!-- Wealth Engine Section -->
         <section id="wealth-engine" class="tab-content">
           <h2 class="text-3xl font-bold text-slate-800 mb-2">Wealth Engine</h2>
           <p class="text-slate-500 mb-8">
@@ -953,7 +1081,6 @@
                 strategies for each goal.
               </p>
               <div class="space-y-4">
-                <!-- Retirement -->
                 <details
                   class="group bg-slate-50 p-4 rounded-lg cursor-pointer"
                 >
@@ -987,7 +1114,6 @@
                     </ul>
                   </div>
                 </details>
-                <!-- Child's Future -->
                 <details
                   class="group bg-slate-50 p-4 rounded-lg cursor-pointer"
                 >
@@ -1021,7 +1147,6 @@
                     </ul>
                   </div>
                 </details>
-                <!-- Parents' Care -->
                 <details
                   class="group bg-slate-50 p-4 rounded-lg cursor-pointer"
                 >
@@ -1117,7 +1242,6 @@
           </div>
         </section>
 
-        <!-- Action Plan Section -->
         <section id="action-plan" class="tab-content">
           <h2 class="text-3xl font-bold text-slate-800 mb-2">
             Your Action Plan
@@ -1128,7 +1252,6 @@
           </p>
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Immediate Actions -->
             <div
               class="bg-white p-6 rounded-lg shadow-md border-t-4 border-red-500"
             >
@@ -1174,7 +1297,6 @@
               </ul>
             </div>
 
-            <!-- Short-term Actions -->
             <div
               class="bg-white p-6 rounded-lg shadow-md border-t-4 border-amber-500"
             >
@@ -1220,7 +1342,6 @@
               </ul>
             </div>
 
-            <!-- Long-term Actions -->
             <div
               class="bg-white p-6 rounded-lg shadow-md border-t-4 border-green-500"
             >
@@ -1285,6 +1406,9 @@
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
           }).format(value);
+        
+        const formatCurrencyWithDecimal = (value) => 
+          `₹${Number(value).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
         function navigateTo(hash) {
           navLinks.forEach((link) =>
@@ -1885,6 +2009,223 @@
           alertModal.style.display = "none";
         });
 
+        // ====================================================================
+        // START of Integrated Financial Planner Logic
+        // ====================================================================
+
+        const financialData = {
+            income: [
+                { description: 'Your Net Salary', amount: 200000 },
+            ],
+            fixedExpenses: [
+                { description: 'Rent', amount: 59850.00 },
+                { description: 'Electricity', amount: 3500.00 },
+                { description: 'Cooking Gas', amount: 1250.00 },
+                { description: 'Airtel (total)', amount: 5250.00 },
+                { description: 'Maid', amount: 5000.00 },
+                { description: 'Maintenance-Society', amount: 10400.00 },
+                { description: 'Apple', amount: 100.00 },
+                { description: 'Coursera', amount: 5000.00 },
+                { description: 'Linkedin', amount: 1000.00 }
+            ],
+            variableExpenses: [
+                { description: 'Grocery', amount: 15000.00 },
+                { description: 'Medicine', amount: 5000.00 },
+                { description: 'School Fees', amount: 9266.67 },
+                { description: 'Kids Extra-Cirricular', amount: 10000.00 }
+            ],
+            savings: [
+                { description: 'SG Investment', amount: 70000.00 },
+                { description: 'SBI Securities', amount: 5000.00 }
+            ]
+        };
+
+        let overviewChart, expenseChart;
+
+        function renderFinancialTable(type) {
+            const tableBody = document.getElementById(`${type}TableBody`);
+            if (!tableBody) return;
+            
+            tableBody.innerHTML = '';
+            financialData[type].forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-200 table-row-hover';
+                row.innerHTML = `
+                    <td class="py-2 pr-2">
+                        <input type="text" value="${item.description}" class="w-full bg-transparent tax-input" data-field="description" data-type="${type}" data-index="${index}">
+                    </td>
+                    <td class="py-2 pr-2">
+                        <input type="number" value="${item.amount}" class="w-full bg-transparent text-right tax-input" data-field="amount" data-type="${type}" data-index="${index}">
+                    </td>
+                    <td class="py-2 w-10">
+                        <button class="btn-danger p-1 rounded-full text-xs delete-item-btn" data-type="${type}" data-index="${index}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        function handleAddItem(event) {
+            const container = event.target.closest('[data-type]');
+            if (!container) return;
+            
+            const type = container.dataset.type;
+            const descInput = container.querySelector(`input[id^="new"][type="text"]`);
+            const amountInput = container.querySelector(`input[id^="new"][type="number"]`);
+
+            if (descInput && amountInput) {
+                const description = descInput.value.trim();
+                const amount = parseFloat(amountInput.value);
+
+                if(description && !isNaN(amount) && amount >= 0) {
+                    financialData[type].push({ description, amount });
+                    descInput.value = '';
+                    amountInput.value = '';
+                    updateFinancialDashboard();
+                } else {
+                    showAlert('Please enter a valid description and a positive amount.');
+                }
+            }
+        }
+
+        function handleFinancialTableChange(event) {
+            const { type, index, field } = event.target.dataset;
+            let value = event.target.value;
+
+            if (field === 'amount') {
+                value = parseFloat(value);
+                if (isNaN(value)) return;
+            }
+
+            if (type && index && field) {
+                financialData[type][index][field] = value;
+                updateFinancialDashboard();
+            }
+        }
+
+        function handleDeleteItem(event) {
+            const { type, index } = event.currentTarget.dataset;
+            if (type && index) {
+                financialData[type].splice(index, 1);
+                updateFinancialDashboard();
+            }
+        }
+
+        function calculateFinancialTotals() {
+            const totalIncome = financialData.income.reduce((sum, item) => sum + item.amount, 0);
+            const totalFixedExpenses = financialData.fixedExpenses.reduce((sum, item) => sum + item.amount, 0);
+            const totalVariableExpenses = financialData.variableExpenses.reduce((sum, item) => sum + item.amount, 0);
+            const totalExpenses = totalFixedExpenses + totalVariableExpenses;
+            const totalSavings = financialData.savings.reduce((sum, item) => sum + item.amount, 0);
+            const netSurplus = totalIncome - totalExpenses - totalSavings;
+            return { totalIncome, totalExpenses, totalSavings, netSurplus, totalFixedExpenses, totalVariableExpenses };
+        }
+
+        function updateFinancialDashboard() {
+            Object.keys(financialData).forEach(type => renderFinancialTable(type));
+
+            const totals = calculateFinancialTotals();
+            
+            const totalIncomeEl = document.getElementById('totalIncome');
+            const totalExpensesEl = document.getElementById('totalExpenses');
+            const totalSavingsEl = document.getElementById('totalSavings');
+            const netSurplusEl = document.getElementById('netSurplus');
+            const netSurplusTitleEl = document.getElementById('netSurplusTitle');
+
+            if (totalIncomeEl && totalExpensesEl && totalSavingsEl && netSurplusEl && netSurplusTitleEl) {
+                totalIncomeEl.textContent = formatCurrencyWithDecimal(totals.totalIncome);
+                totalExpensesEl.textContent = formatCurrencyWithDecimal(totals.totalExpenses);
+                totalSavingsEl.textContent = formatCurrencyWithDecimal(totals.totalSavings);
+                
+                netSurplusEl.textContent = formatCurrencyWithDecimal(totals.netSurplus);
+                netSurplusEl.classList.toggle('text-green-600', totals.netSurplus >= 0);
+                netSurplusEl.classList.toggle('text-red-600', totals.netSurplus < 0);
+                netSurplusEl.classList.toggle('text-slate-800', totals.netSurplus === 0);
+                netSurplusTitleEl.textContent = totals.netSurplus >= 0 ? "Net Surplus" : "Net Deficit";
+            }
+
+            updateFinancialCharts(totals);
+        }
+
+        function updateFinancialCharts(totals) {
+            const { totalExpenses, totalSavings } = totals;
+            
+            const overviewData = {
+                labels: ['Expenses', 'Savings', 'Surplus'],
+                datasets: [{
+                    data: [totalExpenses, totalSavings, Math.max(0, totals.netSurplus)],
+                    backgroundColor: ['#EF5350', '#42A5F5', '#66BB6A'],
+                    borderColor: '#FDFBF8',
+                    borderWidth: 4,
+                }]
+            };
+
+            const overviewCtx = document.getElementById('overviewChart');
+            if (overviewCtx) {
+                if (overviewChart) {
+                    overviewChart.data = overviewData;
+                    overviewChart.update();
+                } else {
+                    overviewChart = new Chart(overviewCtx.getContext('2d'), {
+                        type: 'doughnut',
+                        data: overviewData,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '60%',
+                            plugins: {
+                                legend: { position: 'bottom' },
+                                tooltip: { callbacks: { label: (c) => `${c.label}: ${formatCurrencyWithDecimal(c.parsed)}` } }
+                            }
+                        }
+                    });
+                }
+            }
+
+            const allExpenses = [...financialData.fixedExpenses, ...financialData.variableExpenses].filter(e => e.amount > 0);
+            const expenseData = {
+                labels: allExpenses.map(e => e.description),
+                datasets: [{
+                    label: 'Expense Amount',
+                    data: allExpenses.map(e => e.amount),
+                    backgroundColor: '#86A397',
+                    borderColor: '#5A6F64',
+                    borderWidth: 1,
+                }]
+            };
+            
+            const expenseCtx = document.getElementById('expenseChart');
+            if (expenseCtx) {
+                if (expenseChart) {
+                    expenseChart.data = expenseData;
+                    expenseChart.update();
+                } else {
+                    expenseChart = new Chart(expenseCtx.getContext('2d'), {
+                        type: 'bar',
+                        data: expenseData,
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: { callbacks: { label: (c) => `${c.label}: ${formatCurrencyWithDecimal(c.parsed.x)}` } }
+                            },
+                            scales: {
+                                x: { ticks: { callback: (v) => formatCurrencyWithDecimal(v) } }
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
+        // ====================================================================
+        // END of Integrated Financial Planner Logic
+        // ====================================================================
+
         // Initial calls
         navigateTo(window.location.hash || "#dashboard");
         updateTaxComparison();
@@ -1892,6 +2233,25 @@
           (parseFloat(monthlyExpensesInput.value) || 0) * 6
         );
         updateReportList();
+        updateFinancialDashboard();
+
+        // Add event listeners for the financial planner tables
+        document.querySelectorAll('.add-item-btn').forEach(button => {
+            button.addEventListener('click', handleAddItem);
+        });
+
+        document.querySelectorAll('.financial-planner-card tbody').forEach(tbody => {
+            tbody.addEventListener('change', handleFinancialTableChange);
+        });
+        
+        document.querySelectorAll('.financial-planner-card tbody').forEach(tbody => {
+            tbody.addEventListener('click', (event) => {
+                if (event.target.closest('.delete-item-btn')) {
+                    handleDeleteItem(event);
+                }
+            });
+        });
+
       });
     </script>
   </body>
